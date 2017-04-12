@@ -103,10 +103,16 @@ function camera(){
 
 	this.deltaTime = 0;
 
+	this.ZoomInToFitWithOf = null;
+
 	this.update = function(canvas, context, deltaTime){
 		this.canvas		= canvas;
 		this.context 	= context;
 		this.deltaTime	= deltaTime;
+
+		if(this.ZoomInToFitWithOf != null){//zoom in
+			this.zoomFactor = this.canvas.width/this.ZoomInToFitWithOf;
+		}
 
 		if(this.centerTo != null){//center the camera
 			centerPoint = new vector2D(0, 0)
@@ -118,21 +124,22 @@ function camera(){
 			objectCenter.times(0.5);
 
 			centerPoint.add(objectCenter);
-
+			//centerPoint.divided(this.zoomFactor)
 			
 
 			this.position = centerPoint;
-			this.position.add(new vector2D( -(canvas.width/2), -(canvas.height/2)));
+			this.position.add(new vector2D( -(canvas.width/2)/this.zoomFactor, -(canvas.height/2)/this.zoomFactor ));
 
 		}
 
 		this.context.clearRect(0, 0, canvas.width, canvas.height)//clear the canvas
+
 	}
 
 	this.getScreenPosition = function(position){//translate a world position into a Screen position
 		newPosition = new vector2D(0, 0);
 		newPosition.add(position);
-		newPosition.subtract(this.position)
+		newPosition.subtract(this.position);
 		newPosition.times(this.zoomFactor);
 		return newPosition;
 	}
@@ -156,6 +163,11 @@ function vector2D(x0, x1){
 	this.times = function(scalar){
 		this.x0*=scalar;
 		this.x1*=scalar;
+	}
+
+	this.divided = function(scalar){
+		this.x0/=scalar;
+		this.x1/=scalar;
 	}
 
  

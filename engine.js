@@ -63,7 +63,8 @@ function gpObject(){//graphical physical Object
 
 	this.move = new vector2D(0, 0)
 
-	this.draw = function(camera){
+	this.update = function(camera){ // width and height, movement etc
+
 		ScreenPosition = camera.getScreenPosition(this.position)
 		camera.context.fillStyle = this.color;
 
@@ -84,12 +85,61 @@ function gpObject(){//graphical physical Object
 				factor = this.size.x1/this.image.height;
 				this.size.x0 = factor*this.image.height;
 			}
+		}
+
+	};
+
+
+	this.draw = function(camera){
+			
+		this.update(camera)
+
+		if(this.image != null){//if there is a Image
 			camera.context.drawImage(this.image, ScreenPosition.x0, ScreenPosition.x1, this.size.x0*camera.zoomFactor, this.size.x1*camera.zoomFactor);
 		}else{
 			camera.context.fillRect(ScreenPosition.x0, ScreenPosition.x1, this.size.x0*camera.zoomFactor, this.size.x1*camera.zoomFactor);
 		}
 	}
 }
+
+function gBackground(){//fill the hole background with one Image, in a loop
+	this.draw = function(camera){
+		this.update(camera);
+
+
+		screenSize = new vector2D(
+			Math.floor(this.size.x0*camera.zoomFactor)-1,
+			Math.floor(this.size.x1*camera.zoomFactor)-1)//the size the object has on the screen
+
+		//how many tiles are needed to fill the canvas
+		tiles = new vector2D((camera.canvas.width/screenSize.x0)+2,
+		 (camera.canvas.height/screenSize.x1)+2);
+
+		for (var x = -1; x < tiles.x0; x++) {
+			for (var y = -1; y < tiles.x1; y++) {
+				if(this.image != null){//if there is a Image
+					
+					offsetX = camera.getScreenPosition(this.position).x0%(screenSize.x0);
+					offsetY = camera.getScreenPosition(this.position).x1%(screenSize.x1);
+
+					camera.context.drawImage(this.image,
+					 x*screenSize.x0 + offsetX, 
+					 y*screenSize.x1 + offsetY, 
+					 screenSize.x0+1, 
+					 screenSize.x1+1);
+				}else{
+					camera.context.fillRect(
+						x*screenSize.x0 + offsetX, 
+						y*screenSize.x1 + offsetY, 
+						screenSize.x0+1, 
+						screenSize.x1+1);
+				}
+			};
+		};
+
+	}
+}
+gBackground.prototype = new gpObject();
 
 
 function camera(){

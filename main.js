@@ -1,12 +1,23 @@
 driver = new game(document.getElementById("game"));
 
 driverCam = new camera();
-driverCam.ZoomInToFitWithOf = 500;
+driverCam.ZoomInToFitWithOf = 700;
 driverScene = new scene(driverCam)
 driver.addScene(driverScene);
 
 IceImage = new Image();
 IceImage.src = "./ice.png";
+
+RoadImage = new Image();
+RoadImage.src = "./road.png"
+
+road = new gBackground();
+road.size = new vector2D(600, 100);
+road.color = "blue";
+road.image = RoadImage;
+road.fixHeight = false;
+road.position = new vector2D(-300, -800);
+driverScene.addGPObject(road);
 
 exampleBackground = new gpObject();
 exampleBackground.size = new vector2D(100, 100);
@@ -34,11 +45,12 @@ driverScene.addGPObject(exampleBackground2);
 
 player = new gpObject();
 player.size = new vector2D(100, 100);
+player.position = new vector2D(-50, 100);
 PlayerImage = new Image();
 PlayerImage.src = "./player.png"
 player.image= PlayerImage;
 player.fixHeight = false;
-player.move = new vector2D(0, -1)
+player.move = new vector2D(0, -0.5)
 driverScene.addGPObject(player);
 driverCam.centerTo = player;
 

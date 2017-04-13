@@ -61,7 +61,7 @@ player = new gpObject();
 player.size = new vector2D(100, 100);
 player.onCollide = function(ele){
 	if(ele.name == "Ice"){
-		alert("gameover: " + ele.name);
+		console.log("gameover: " + ele.name);
 	}
 }
 player.position = new vector2D(-50, 0);
@@ -74,7 +74,7 @@ driverScene.addGPObject(player);
 driverCam.focusTo = player;
 
 cameraFocus = new gpObject();
-cameraFocus.size = new vector2D(100, 200);
+cameraFocus.size = new vector2D(100, 250);
 cameraFocus.color = "rgba(0, 0, 0, 0)"
 cameraFocus.position = new vector2D(-50, 0);
 cameraFocus.fixHeight = false;

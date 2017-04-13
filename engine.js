@@ -349,7 +349,9 @@ function camera(){
 			
 
 			this.position = centerPoint;
-			this.position.add(new vector2D( -(canvas.width/2)/this.zoomFactor, (-this.canvas.height+this.focusTo.size.x1)/this.zoomFactor));
+			this.position.x0-=(canvas.width/2)/this.zoomFactor
+			//to the bottom on X
+			this.position.x1 =-(this.canvas.height/this.zoomFactor)+(this.focusTo.position.x1 + this.focusTo.size.x1)
 		}
 
 		this.context.clearRect(0, 0, canvas.width, canvas.height)//clear the canvas

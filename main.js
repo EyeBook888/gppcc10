@@ -76,7 +76,7 @@ driverCam.focusTo = player;
 cameraFocus = new gpObject();
 cameraFocus.size = new vector2D(100, 200);
 cameraFocus.color = "rgba(0, 0, 0, 0)"
-cameraFocus.position = new vector2D(-50, 100);
+cameraFocus.position = new vector2D(-50, 0);
 cameraFocus.fixHeight = false;
 cameraFocus.move = new vector2D(0, -0.5)
 driverScene.addGPObject(cameraFocus);

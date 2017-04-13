@@ -168,6 +168,7 @@ function scene(camera){
 	this.objectList = new Array();
 
 	this.addGPObject = function(gpObject){
+		gpObject.scene = this;
 		this.objectList.push(gpObject);
 	}
 
@@ -184,13 +185,36 @@ function scene(camera){
 function gpObject(){//graphical physical Object
 	this.position 	= new vector2D(0, 0);
 	this.size  		= new vector2D(0, 0);
-	this.color 		= "red"
+	this.color 		= "red";
+
+	this.scene = null;//to address the scene in which the object is in
 
 	this.image = null;
 	this.fixWidth = true;
 	this.fixHeight = true;//should the object fit the Image
 
 	this.move = new vector2D(0, 0)
+
+	this.onCollide = null;//function (gbObject)
+
+	this.triggerCollide = function(){
+		if(this.onCollide != null){ //don't even test if there is no collide function
+			for (var i = 0; i < this.scene.objectList.length; i++) {//check every object from the scene
+				currentObject = this.scene.objectList[i];
+				//if(currentObject.name == "klnljkblyhglkfhlskfghjldfkgjhldfkghn"){
+					if (this.position.x0 < currentObject.position.x0 + currentObject.size.x0 &&
+  						this.position.x0 + this.size.x0 > currentObject.position.x0 &&
+   						this.position.x1 < currentObject.position.x1 &&
+   						this.position.x1 + this.size.x1 > currentObject.position.x1
+   						) {
+						//console.log(this.position.x1 + "<" + currentObject.position.x1 );
+	
+						this.onCollide(currentObject);
+					}
+				//}
+			};
+		}
+	}
 
 	this.update = function(camera){ // width and height, movement etc
 
@@ -216,6 +240,7 @@ function gpObject(){//graphical physical Object
 			}
 		}
 
+		this.triggerCollide();
 	};
 
 
@@ -373,6 +398,13 @@ function vector2D(x0, x1){
 }
 
 
+idCount = -1;
+function getAid(){//return a unique if for every gameobject or other stuff that need
+	idCount++;
+	return idCount;
+}
+
 setting = new Array();
 setting.CENTER = 0;
 setting.BOTTOM = 1;
+

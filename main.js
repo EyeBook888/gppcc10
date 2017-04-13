@@ -41,33 +41,30 @@ road.fixHeight = false;
 road.position = new vector2D(-300, -800);
 driverScene.addGPObject(road);
 
-exampleBackground = new gpObject();
-exampleBackground.size = new vector2D(100, 100);
-exampleBackground.color = "blue";
-exampleBackground.image = IceImage;
-exampleBackground.fixHeight = false;
-exampleBackground.position = new vector2D(-10, -300);
-driverScene.addGPObject(exampleBackground);
+IceBlock = new Array();
 
-exampleBackground1 = new gpObject();
-exampleBackground1.size = new vector2D(100, 100);
-exampleBackground1.color = "blue";
-exampleBackground1.image = IceImage;
-exampleBackground1.fixHeight = false;
-exampleBackground1.position = new vector2D(10, -500);
-driverScene.addGPObject(exampleBackground1);
+for(i = 0; i <= 100; i++){
+	IceBlock[i] = new gpObject();
+	IceBlock[i].size = new vector2D(100, 100);
+	IceBlock[i].color = "blue";
+	IceBlock[i].name = "Ice"
+	IceBlock[i].image = IceImage;
+	IceBlock[i].fixHeight = false;
+	x = Math.round(Math.random()*600-300);
+	y = Math.round(Math.random()*300) - 800;
+	IceBlock[i].position = new vector2D(x , -i*800 + y);
+	driverScene.addGPObject(IceBlock[i]);
+}
 
-exampleBackground2 = new gpObject();
-exampleBackground2.size = new vector2D(100, 100);
-exampleBackground2.color = "blue";
-exampleBackground2.image = IceImage;
-exampleBackground2.fixHeight = false;
-exampleBackground2.position = new vector2D(10, -800);
-driverScene.addGPObject(exampleBackground2);
 
 player = new gpObject();
 player.size = new vector2D(100, 100);
-player.position = new vector2D(-50, 100);
+player.onCollide = function(ele){
+	if(ele.name == "Ice"){
+		alert("gameover: " + ele.name);
+	}
+}
+player.position = new vector2D(-50, 0);
 PlayerImage = new Image();
 PlayerImage.src = "./player.png"
 player.image= PlayerImage;
@@ -75,6 +72,15 @@ player.fixHeight = false;
 player.move = new vector2D(0, -0.5)
 driverScene.addGPObject(player);
 driverCam.focusTo = player;
+
+cameraFocus = new gpObject();
+cameraFocus.size = new vector2D(100, 200);
+cameraFocus.color = "rgba(0, 0, 0, 0)"
+cameraFocus.position = new vector2D(-50, 100);
+cameraFocus.fixHeight = false;
+cameraFocus.move = new vector2D(0, -0.5)
+driverScene.addGPObject(cameraFocus);
+driverCam.focusTo = cameraFocus;
 
 
 

@@ -2,12 +2,17 @@ driver = new game(document.getElementById("game"));
 
 driverCam = new camera();
 driverCam.ZoomInToFitWithOf = 700;
+driverCam.focusPosition = setting.BOTTOM;
 driverScene = new scene(driverCam)
+
+
 driverScene.pullLeft = function(){
-	player.move = new vector2D(-0.2, -0.5)
+	player.move = new vector2D(-0.25, -0.5)
+	//player.position.add(new vector2D(-100, 0))
 }
 driverScene.pullRight = function(){
-	player.move = new vector2D(0.2, -0.5)
+	player.move = new vector2D(0.25, -0.5)
+	//player.position.add(new vector2D(100, 0))
 }
 
 driverScene.pullDown = function(){
@@ -17,6 +22,8 @@ driverScene.pullDown = function(){
 driverScene.pullUp = function(){
 	player.move = new vector2D(0, -0.5)
 }
+
+
 
 driver.addScene(driverScene);
 
@@ -67,7 +74,7 @@ player.image= PlayerImage;
 player.fixHeight = false;
 player.move = new vector2D(0, -0.5)
 driverScene.addGPObject(player);
-driverCam.centerTo = player;
+driverCam.focusTo = player;
 
 
 

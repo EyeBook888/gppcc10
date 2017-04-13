@@ -1,6 +1,6 @@
 //disable scrolling
 window.onscroll = function () {
-window.scrollTo(0,0);
+window.scrollTo(0,0); return false;
 }
 
 function game(canvas){
@@ -66,7 +66,7 @@ function game(canvas){
 				event.clientY);
 			this.controlEnd(position);
 		}
-		clickStartEnd++;
+		clickEndCount++;
 	}
 
 	theGame = this;//for the events
@@ -278,7 +278,9 @@ function camera(){
 	this.canvas		= null;
 	this.context 	= null;
 
-	this.centerTo = null; //if a gpObject should always in the middle of the window
+	this.focusTo = null; //if a gpObject should always in the middle of the window
+	this.focusPosition = setting.CENTER; //should the gpObject be in the middle or same were else
+
 
 	this.deltaTime = 0;
 
@@ -293,13 +295,13 @@ function camera(){
 			this.zoomFactor = this.canvas.width/this.ZoomInToFitWithOf;
 		}
 
-		if(this.centerTo != null){//center the camera
+		if(this.focusTo != null && this.focusPosition == setting.CENTER){//center the camera
 			centerPoint = new vector2D(0, 0)
-			centerPoint.add(this.centerTo.position);
+			centerPoint.add(this.focusTo.position);
 
 			
 			objectCenter = new vector2D(0, 0)
-			objectCenter.add(this.centerTo.size);
+			objectCenter.add(this.focusTo.size);
 			objectCenter.times(0.5);
 
 			centerPoint.add(objectCenter);
@@ -308,6 +310,21 @@ function camera(){
 			this.position = centerPoint;
 			this.position.add(new vector2D( -(canvas.width/2)/this.zoomFactor, -(canvas.height/2)/this.zoomFactor ));
 
+		}else if(this.focusTo != null && this.focusPosition == setting.BOTTOM){
+			//center on X
+			centerPoint = new vector2D(0, 0)
+			centerPoint.add(this.focusTo.position);
+
+			
+			objectCenter = new vector2D(0, 0)
+			objectCenter.add(this.focusTo.size);
+			objectCenter.times(0.5);
+
+			centerPoint.add(objectCenter);
+			
+
+			this.position = centerPoint;
+			this.position.add(new vector2D( -(canvas.width/2)/this.zoomFactor, (-this.canvas.height+this.focusTo.size.x1)/this.zoomFactor));
 		}
 
 		this.context.clearRect(0, 0, canvas.width, canvas.height)//clear the canvas
@@ -355,3 +372,7 @@ function vector2D(x0, x1){
  
 }
 
+
+setting = new Array();
+setting.CENTER = 0;
+setting.BOTTOM = 1;

@@ -1,3 +1,8 @@
+//disable scrolling
+window.onscroll = function () {
+window.scrollTo(0,0);
+}
+
 function game(canvas){
 
 	this.sceneList		= new Array();
@@ -10,6 +15,130 @@ function game(canvas){
 	this.canvas.style.position 	= "absolute";
 	this.canvas.style.top 		= "0px";
 	this.canvas.style.left 		= "0px";
+
+
+	//touch and click events
+
+	touchStartCount = 0;//for not trigger the event twice on mobile
+	clickStartCount = 0;
+
+	this.touchStart = function(event){
+		if(touchStartCount >= clickStartCount){
+			position = new vector2D(
+				event.touches[0].pageX,
+				event.touches[0].pageY); 
+			this.controlStart(position);
+		}
+
+		touchStartCount++;
+	}
+
+	this.clickStart = function(event){
+		if(clickStartCount >= touchStartCount){
+			position = new vector2D(
+				event.clientX,
+				event.clientY);
+			this.controlStart(position);
+		}
+		clickStartCount++;
+
+	}
+
+
+	touchEndCount = 0;//for not trigger the event twice on mobile
+	clickEndCount = 0;
+
+	this.touchEnd = function(event){
+		if(touchEndCount >= clickEndCount){
+			position = new vector2D(
+				lastTouchMove.touches[0].pageX,
+				lastTouchMove.touches[0].pageY); 
+			this.controlEnd(position);
+		}
+		touchEndCount++;
+
+	}
+
+	this.clickEnd = function(event){
+		if(clickEndCount >= touchEndCount){
+			position = new vector2D(
+				event.clientX,
+				event.clientY);
+			this.controlEnd(position);
+		}
+		clickStartEnd++;
+	}
+
+	theGame = this;//for the events
+
+	this.canvas.addEventListener ('touchstart', function(event){theGame.touchStart(event)});
+	this.canvas.addEventListener ('mousedown',  function(event){theGame.clickStart(event)});
+
+	this.canvas.addEventListener ('touchend', function(event){theGame.touchEnd(event)});
+	this.canvas.addEventListener ('mouseup',  function(event){theGame.clickEnd(event)});
+
+	this.canvas.addEventListener('touchmove', function(event) {
+  		lastTouchMove = event;
+	});
+
+	controlStartPosition = null;//for the height Level events
+
+	this.controlStart = function(position){//touchstart event for smart phone and mouse down on PC
+		controlStartPosition = position;
+
+		for (var i = 0; i < this.sceneList.length; i++) {//go to all element and trigger the event
+			if(this.sceneList[i].controlStart != null){
+				this.sceneList[i].controlStart(position)
+			}
+		};
+	}
+
+	this.controlEnd = function(position){//touchend event for smart phone and mouse up on PC
+		for (var i = 0; i < this.sceneList.length; i++) {//go to all element and trigger the event
+			if(this.sceneList[i].controlEnd != null){
+				this.sceneList[i].controlEnd(position)
+			}
+		};
+
+		//height Level events
+		wayX = position.x0 - controlStartPosition.x0;
+		wayY = position.x1 - controlStartPosition.x1;
+		if(Math.abs(wayX) > Math.abs(wayY) && wayX > 0){
+			//pull right
+			for (var i = 0; i < this.sceneList.length; i++) {//go to all element and trigger the event
+				if(this.sceneList[i].pullRight != null){
+					this.sceneList[i].pullRight()
+				}
+			};
+		}
+
+		else if(Math.abs(wayX) > Math.abs(wayY) && wayX < 0){
+			//pull left
+			for (var i = 0; i < this.sceneList.length; i++) {//go to all element and trigger the event
+				if(this.sceneList[i].pullLeft != null){
+					this.sceneList[i].pullLeft()
+				}
+			};
+		}
+		else if(Math.abs(wayX) < Math.abs(wayY) && wayY < 0){
+			//pull Up
+			for (var i = 0; i < this.sceneList.length; i++) {//go to all element and trigger the event
+				if(this.sceneList[i].pullUp != null){
+					this.sceneList[i].pullUp()
+				}
+			};
+		}
+
+		else if(Math.abs(wayX) < Math.abs(wayY) && wayY > 0){
+			//pull left
+			for (var i = 0; i < this.sceneList.length; i++) {//go to all element and trigger the event
+				if(this.sceneList[i].pullDown != null){
+					this.sceneList[i].pullDown()
+				}
+			};
+		}
+	}
+
 
 
 	this.update = function(){//handle for example the draw call
@@ -174,7 +303,6 @@ function camera(){
 			objectCenter.times(0.5);
 
 			centerPoint.add(objectCenter);
-			//centerPoint.divided(this.zoomFactor)
 			
 
 			this.position = centerPoint;
@@ -218,6 +346,10 @@ function vector2D(x0, x1){
 	this.divided = function(scalar){
 		this.x0/=scalar;
 		this.x1/=scalar;
+	}
+
+	this.getString = function(){
+		return "(" + this.x0 + "|" + this.x1 + ")";
 	}
 
  

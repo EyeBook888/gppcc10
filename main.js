@@ -3,6 +3,21 @@ driver = new game(document.getElementById("game"));
 driverCam = new camera();
 driverCam.ZoomInToFitWithOf = 700;
 driverScene = new scene(driverCam)
+driverScene.pullLeft = function(){
+	player.move = new vector2D(-0.2, -0.5)
+}
+driverScene.pullRight = function(){
+	player.move = new vector2D(0.2, -0.5)
+}
+
+driverScene.pullDown = function(){
+	player.move = new vector2D(0, -0.5)
+}
+
+driverScene.pullUp = function(){
+	player.move = new vector2D(0, -0.5)
+}
+
 driver.addScene(driverScene);
 
 IceImage = new Image();

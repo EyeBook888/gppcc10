@@ -1,7 +1,15 @@
 //disable scrolling
-window.onscroll = function () {
-window.scrollTo(0,0); return false;
+window.addEventListener("scroll", preventMotion, false);
+window.addEventListener("touchmove", preventMotion, false);
+
+function preventMotion(event)
+{
+   	window.scrollTo(0, 0);
+   	event.preventDefault();
+   	event.stopPropagation();
 }
+
+
 
 function game(canvas){
 

@@ -1,6 +1,16 @@
 myGame = new game(document.getElementById("game"));
 Interval = null;
 
+//loading the Images
+PlayerImage = new Image();
+PlayerImage.src = "./player.png"
+	
+IceImage = new Image();
+IceImage.src = "./ice.png";
+	
+RoadImage = new Image();
+RoadImage.src = "./road.png"
+
 
 function startDriving(roadLength){
 
@@ -31,11 +41,6 @@ function startDriving(roadLength){
 	
 	myGame.addScene(driverScene);
 	
-	IceImage = new Image();
-	IceImage.src = "./ice.png";
-	
-	RoadImage = new Image();
-	RoadImage.src = "./road.png"
 	
 	road = new gBackground();
 	road.size = new vector2D(600, 100);
@@ -80,6 +85,37 @@ function startDriving(roadLength){
 	WinLine.position = new vector2D(-350 , -roadLength);
 	driverScene.addGPObject(WinLine);
 
+
+	//Borders -> not let the Player out of the screen
+
+	looseLeftBorder = new gpObject();
+	looseLeftBorder.size = new vector2D(100, roadLength +500);
+	looseLeftBorder.tag = "gameover"
+	looseLeftBorder.color = "red";
+	looseLeftBorder.onCollide = function(ele){
+		if(ele == player){
+			alert("gameover");
+			driverScene.drop();
+			startDriving(3000)
+		}
+	}
+	looseLeftBorder.position = new vector2D(-450 , -roadLength);
+	driverScene.addGPObject(looseLeftBorder);
+
+	looseRightBorder = new gpObject();
+	looseRightBorder.size = new vector2D(100, roadLength +500);
+	looseRightBorder.tag = "gameover"
+	looseRightBorder.color = "red";
+	looseRightBorder.onCollide = function(ele){
+		if(ele == player){
+			alert("gameover");
+			driverScene.drop();
+			startDriving(3000)
+		}
+	}
+	looseRightBorder.position = new vector2D(350 , -roadLength);
+	driverScene.addGPObject(looseRightBorder);
+
 	
 	
 	player = new gpObject();
@@ -92,8 +128,6 @@ function startDriving(roadLength){
 		}
 	}
 	player.position = new vector2D(-50, 0);
-	PlayerImage = new Image();
-	PlayerImage.src = "./player.png"
 	player.image= PlayerImage;
 	player.fixHeight = false;
 	player.move = new vector2D(0, -0.5)

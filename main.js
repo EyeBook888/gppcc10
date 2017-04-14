@@ -1,8 +1,8 @@
-driver = new game(document.getElementById("game"));
+myGame = new game(document.getElementById("game"));
 Interval = null;
-function startDriving(){
-	
-	driver.sceneList = new Array();//drop the old scene or better replace all not needed elements
+
+
+function startDriving(roadLength){
 
 	driverCam = new camera();
 	driverCam.ZoomInToFitWithOf = 700;
@@ -29,7 +29,7 @@ function startDriving(){
 	
 	
 	
-	driver.addScene(driverScene);
+	myGame.addScene(driverScene);
 	
 	IceImage = new Image();
 	IceImage.src = "./ice.png";
@@ -45,9 +45,12 @@ function startDriving(){
 	road.position = new vector2D(-300, -800);
 	driverScene.addGPObject(road);
 	
+	iceDistance = 800;
+	neededIce 	= Math.ceil(roadLength/iceDistance);
+
 	IceBlock = new Array();
 	
-	for(i = 0; i <= 100; i++){
+	for(i = 0; i <= neededIce; i++){
 		IceBlock[i] = new gpObject();
 		IceBlock[i].size = new vector2D(100, 100);
 		IceBlock[i].color = "blue";
@@ -59,6 +62,24 @@ function startDriving(){
 		IceBlock[i].position = new vector2D(x , -i*800 + y);
 		driverScene.addGPObject(IceBlock[i]);
 	}
+
+
+	//the finish line
+	WinLine = new gpObject();
+	WinLine.size = new vector2D(700, 100);
+	WinLine.color = "blue";
+	WinLine.tag = "gameover"
+	WinLine.color = "green";
+	WinLine.onCollide = function(ele){
+		if(ele == player){
+			alert("win");
+			driverScene.drop();
+			startDriving(5000)
+		}
+	}
+	WinLine.position = new vector2D(-350 , -roadLength);
+	driverScene.addGPObject(WinLine);
+
 	
 	
 	player = new gpObject();
@@ -66,7 +87,8 @@ function startDriving(){
 	player.onCollide = function(ele){
 		if(ele.tag == "gameover"){
 			alert("gameover");
-			startDriving()
+			driverScene.drop();
+			startDriving(3000)
 		}
 	}
 	player.position = new vector2D(-50, 0);
@@ -86,11 +108,11 @@ function startDriving(){
 	cameraFocus.move = new vector2D(0, -0.5)
 	driverScene.addGPObject(cameraFocus);
 	driverCam.focusTo = cameraFocus;
-
-	if(Interval == null){
-		Interval = setInterval(function(){driver.update();}, Math.floor(1000/30));
-	}
 		
 }
 
-startDriving()
+if(Interval == null){
+		Interval = setInterval(function(){myGame.update();}, Math.floor(1000/30));
+}
+
+startDriving(3000)

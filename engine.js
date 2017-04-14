@@ -161,7 +161,8 @@ function game(canvas){
 	}
 
 	this.addScene = function(scene){
-		scene.id = this.sceneList.length;
+		scene.id 	= this.sceneList.length;
+		scene.game 	= this;
 		this.sceneList.push(scene);
 	}
 
@@ -172,6 +173,8 @@ function game(canvas){
 function scene(camera){
 
 	this.camera = camera;
+
+	this.game = null;//reverence to the game i which the scene is in 
 
 	this.objectList = new Array();
 
@@ -185,6 +188,10 @@ function scene(camera){
 		for (var i = 0; i < this.objectList.length; i++) {
 			this.objectList[i].draw(this.camera);
 		};
+	}
+
+	this.drop = function(){
+		this.game.sceneList = remove(this.game.sceneList, this);
 	}
 
 }
@@ -409,9 +416,17 @@ function vector2D(x0, x1){
 
 
 idCount = -1;
-function getAid(){//return a unique if for every gameobject or other stuff that need
+function getAId(){//return a unique if for every gameobject or other stuff that need
 	idCount++;
 	return idCount;
+}
+
+function remove(array, element){
+	var index = array.indexOf(element);
+	if (index > -1) {
+    	array.splice(index, 1);
+	}
+	return array;
 }
 
 setting = new Array();

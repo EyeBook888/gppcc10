@@ -42,12 +42,14 @@ function startDriving(roadLength){
 	myGame.addScene(driverScene);
 	
 	
-	road = new gBackground();
+	road = new gpObject();
 	road.size = new vector2D(600, 100);
 	road.color = "blue";
 	road.image = RoadImage;
 	road.fixHeight = false;
 	road.position = new vector2D(-300, -800);
+	road.addComponent(new componentAdjustSize());
+	road.addComponent(new componentBackground());
 	driverScene.addGPObject(road);
 	
 	iceDistance = 800;
@@ -65,6 +67,8 @@ function startDriving(roadLength){
 		x = Math.round(Math.random()*600-300);
 		y = Math.round(Math.random()*300) - 800;
 		IceBlock[i].position = new vector2D(x , -i*800 + y);
+		IceBlock[i].addComponent(new componentAdjustSize());
+		IceBlock[i].addComponent(new componentBasicDraw());
 		driverScene.addGPObject(IceBlock[i]);
 	}
 
@@ -83,6 +87,9 @@ function startDriving(roadLength){
 		}
 	}
 	WinLine.position = new vector2D(-350 , -roadLength);
+	WinLine.addComponent(new componentAdjustSize())
+	WinLine.addComponent(new componentCollide())
+	WinLine.addComponent(new componentBasicDraw())
 	driverScene.addGPObject(WinLine);
 
 
@@ -100,6 +107,9 @@ function startDriving(roadLength){
 		}
 	}
 	looseLeftBorder.position = new vector2D(-450 , -roadLength);
+	looseLeftBorder.addComponent(new componentAdjustSize())
+	looseLeftBorder.addComponent(new componentCollide())
+	looseLeftBorder.addComponent(new componentBasicDraw())
 	driverScene.addGPObject(looseLeftBorder);
 
 	looseRightBorder = new gpObject();
@@ -114,6 +124,9 @@ function startDriving(roadLength){
 		}
 	}
 	looseRightBorder.position = new vector2D(350 , -roadLength);
+	looseRightBorder.addComponent(new componentAdjustSize())
+	looseRightBorder.addComponent(new componentCollide())
+	looseRightBorder.addComponent(new componentBasicDraw())
 	driverScene.addGPObject(looseRightBorder);
 
 	
@@ -131,8 +144,14 @@ function startDriving(roadLength){
 	player.image= PlayerImage;
 	player.fixHeight = false;
 	player.move = new vector2D(0, -0.5)
+	
+	player.addComponent(new componentAdjustSize())
+	player.addComponent(new componentCollide())
+	player.addComponent(new componentBasicDraw())
+	player.addComponent(new componentMovement())
+
 	driverScene.addGPObject(player);
-	driverCam.focusTo = player;
+
 	
 	cameraFocus = new gpObject();
 	cameraFocus.size = new vector2D(100, 250);
@@ -140,6 +159,10 @@ function startDriving(roadLength){
 	cameraFocus.position = new vector2D(-50, 0);
 	cameraFocus.fixHeight = false;
 	cameraFocus.move = new vector2D(0, -0.5)
+	cameraFocus.addComponent(new componentAdjustSize())
+	cameraFocus.addComponent(new componentCollide())
+	cameraFocus.addComponent(new componentBasicDraw())
+	cameraFocus.addComponent(new componentMovement())
 	driverScene.addGPObject(cameraFocus);
 	driverCam.focusTo = cameraFocus;
 		

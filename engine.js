@@ -212,103 +212,28 @@ function gpObject(){//graphical physical Object
 
 	this.onCollide = null;//function (gbObject)
 
-	this.triggerCollide = function(){
-		if(this.onCollide != null){ //don't even test if there is no collide function
-			for (var i = 0; i < this.scene.objectList.length; i++) {//check every object from the scene
-				currentObject = this.scene.objectList[i];
-				//if(currentObject.name == "klnljkblyhglkfhlskfghjldfkgjhldfkghn"){
-					if (this.position.x0 < currentObject.position.x0 + currentObject.size.x0 &&
-  						this.position.x0 + this.size.x0 > currentObject.position.x0 &&
-   						this.position.x1 < currentObject.position.x1 &&
-   						this.position.x1 + this.size.x1 > currentObject.position.x1
-   						) {
-						//console.log(this.position.x1 + "<" + currentObject.position.x1 );
-	
-						this.onCollide(currentObject);
-					}
-				//}
-			};
-		}
-	}
+	this.components = new Array();
 
-	this.update = function(camera){ // width and height, movement etc
-
-		ScreenPosition = camera.getScreenPosition(this.position)
-		camera.context.fillStyle = this.color;
-
-		//the movement
-		currentMove = new vector2D(0, 0)
-		currentMove.add(this.move);
-		currentMove.times(camera.deltaTime);
-		this.position.add(currentMove)
-
-		if(this.image != null){//if there is a Image
-			//fit the size
-			if(this.fixWidth && !this.fixHeight){
-				//fix width
-				factor = this.size.x0/this.image.width;
-				this.size.x1 = factor*this.image.height;
-			}else if(!this.fixWidth && this.fixHeight){
-				//fix height
-				factor = this.size.x1/this.image.height;
-				this.size.x0 = factor*this.image.height;
+	this.draw = function(camera){
+		for(var i = 0; i < this.components.length; i++){
+			if(this.components[i].draw != null){
+				this.components[i].draw(camera);
 			}
 		}
-
-		this.triggerCollide();
-	};
-
-
-	this.draw = function(camera){
-			
-		this.update(camera)
-
-		if(this.image != null){//if there is a Image
-			camera.context.drawImage(this.image, ScreenPosition.x0, ScreenPosition.x1, this.size.x0*camera.zoomFactor, this.size.x1*camera.zoomFactor);
-		}else{
-			camera.context.fillRect(ScreenPosition.x0, ScreenPosition.x1, this.size.x0*camera.zoomFactor, this.size.x1*camera.zoomFactor);
-		}
 	}
+
+	this.addComponent = function(component){
+		component.gpObject = this;
+		this.components.push(component);
+	} 
+
 }
 
+/*
 function gBackground(){//fill the hole background with one Image, in a loop
-	this.draw = function(camera){
-		this.update(camera);
-
-
-		screenSize = new vector2D(
-			Math.floor(this.size.x0*camera.zoomFactor)-1,
-			Math.floor(this.size.x1*camera.zoomFactor)-1)//the size the object has on the screen
-
-		//how many tiles are needed to fill the canvas
-		tiles = new vector2D((camera.canvas.width/screenSize.x0)+2,
-		 (camera.canvas.height/screenSize.x1)+2);
-
-		for (var x = -1; x < tiles.x0; x++) {
-			for (var y = -1; y < tiles.x1; y++) {
-				if(this.image != null){//if there is a Image
-					
-					offsetX = camera.getScreenPosition(this.position).x0%(screenSize.x0);
-					offsetY = camera.getScreenPosition(this.position).x1%(screenSize.x1);
-
-					camera.context.drawImage(this.image,
-					 x*screenSize.x0 + offsetX, 
-					 y*screenSize.x1 + offsetY, 
-					 screenSize.x0+1, 
-					 screenSize.x1+1);
-				}else{
-					camera.context.fillRect(
-						x*screenSize.x0 + offsetX, 
-						y*screenSize.x1 + offsetY, 
-						screenSize.x0+1, 
-						screenSize.x1+1);
-				}
-			};
-		};
-
-	}
+	
 }
-gBackground.prototype = new gpObject();
+*/
 
 
 function camera(){
@@ -432,4 +357,109 @@ function remove(array, element){
 setting = new Array();
 setting.CENTER = 0;
 setting.BOTTOM = 1;
+
+
+
+// the components
+
+function componentCollide(){
+	this.draw = function(camera){
+		if(this.gpObject.onCollide != null){ //don't even test if there is no collide function
+			for (var i = 0; i < this.gpObject.scene.objectList.length; i++) {//check every object from the scene
+				currentObject = this.gpObject.scene.objectList[i];
+				if (this.gpObject.position.x0 < currentObject.position.x0 + currentObject.size.x0 &&
+  					this.gpObject.position.x0 + this.gpObject.size.x0 > currentObject.position.x0 &&
+   					this.gpObject.position.x1 < currentObject.position.x1 &&
+   					this.gpObject.position.x1 + this.gpObject.size.x1 > currentObject.position.x1
+   					) {
+						this.gpObject.onCollide(currentObject);
+					}
+			};
+		}
+	}
+}
+
+function componentMovement(){
+	this.draw = function(camera){ // width and height, movement etc
+
+		ScreenPosition = camera.getScreenPosition(this.gpObject.position)
+		camera.context.fillStyle = this.gpObject.color;
+
+		//the movement
+		currentMove = new vector2D(0, 0)
+		currentMove.add(this.gpObject.move);
+		currentMove.times(camera.deltaTime);
+		this.gpObject.position.add(currentMove);
+	};
+}
+
+
+function componentAdjustSize(){
+	this.draw = function(camera){ // width and height
+
+		if(this.gpObject.image != null){//if there is a Image
+			//fit the size
+			if(this.gpObject.fixWidth && !this.fixHeight){
+				//fix width
+				factor = this.gpObject.size.x0/this.gpObject.image.width;
+				this.gpObject.size.x1 = factor*this.gpObject.image.height;
+			}else if(!this.gpObject.fixWidth && this.gpObject.fixHeight){
+				//fix height
+				factor = this.gpObject.size.x1/this.gpObject.image.height;
+				this.size.x0 = factor*this.gpObject.image.height;
+			}
+		}
+
+	};
+}
+
+function componentBasicDraw(){
+	this.draw = function(camera){
+			
+		ScreenPosition = camera.getScreenPosition(this.gpObject.position)
+
+		if(this.gpObject.image != null){//if there is a Image
+			camera.context.drawImage(this.gpObject.image, ScreenPosition.x0, ScreenPosition.x1, this.gpObject.size.x0*camera.zoomFactor, this.gpObject.size.x1*camera.zoomFactor);
+		}else{
+			camera.context.fillStyle = this.gpObject.color;
+			camera.context.fillRect(ScreenPosition.x0, ScreenPosition.x1, this.gpObject.size.x0*camera.zoomFactor, this.gpObject.size.x1*camera.zoomFactor);
+		}
+	}
+}
+
+function componentBackground(){
+	this.draw = function(camera){
+
+		screenSize = new vector2D(
+			Math.floor(this.gpObject.size.x0*camera.zoomFactor)-1,
+			Math.floor(this.gpObject.size.x1*camera.zoomFactor)-1)//the size the object has on the screen
+
+		//how many tiles are needed to fill the canvas
+		tiles = new vector2D((camera.canvas.width/screenSize.x0)+2,
+		 (camera.canvas.height/screenSize.x1)+2);
+
+		for (var x = -1; x < tiles.x0; x++) {
+			for (var y = -1; y < tiles.x1; y++) {
+				if(this.gpObject.image != null){//if there is a Image
+					
+					offsetX = camera.getScreenPosition(this.gpObject.position).x0%(screenSize.x0);
+					offsetY = camera.getScreenPosition(this.gpObject.position).x1%(screenSize.x1);
+
+					camera.context.drawImage(this.gpObject.image,
+					 x*screenSize.x0 + offsetX, 
+					 y*screenSize.x1 + offsetY, 
+					 screenSize.x0+1, 
+					 screenSize.x1+1);
+				}else{
+					camera.context.fillRect(
+						x*screenSize.x0 + offsetX, 
+						y*screenSize.x1 + offsetY, 
+						screenSize.x0+1, 
+						screenSize.x1+1);
+				}
+			};
+		};
+
+	}
+}
 

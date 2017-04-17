@@ -2,8 +2,7 @@
 window.addEventListener("scroll", preventMotion, false);
 window.addEventListener("touchmove", preventMotion, false);
 
-function preventMotion(event)
-{
+function preventMotion(event){
    	window.scrollTo(0, 0);
    	event.preventDefault();
    	event.stopPropagation();
@@ -198,19 +197,8 @@ function scene(camera){
 
 
 function gpObject(){//graphical physical Object
-	this.position 	= new vector2D(0, 0);
-	this.size  		= new vector2D(0, 0);
-	this.color 		= "red";
-
+	
 	this.scene = null;//to address the scene in which the object is in
-
-	this.image = null;
-	this.fixWidth = true;
-	this.fixHeight = true;//should the object fit the Image
-
-	this.move = new vector2D(0, 0)
-
-	this.onCollide = null;//function (gbObject)
 
 	this.components = new Array();
 
@@ -224,16 +212,21 @@ function gpObject(){//graphical physical Object
 
 	this.addComponent = function(component){
 		component.gpObject = this;
+		if(component.init != null){component.init();}
 		this.components.push(component);
-	} 
+	}
 
+	this.addParameter = function(name, value){//to add a variable to the object (if it not exist) (by components)
+		if(this[name] == null){
+			this[name] = value;
+		}
+	}
+
+	this.drop = function(){
+		this.game.sceneList = remove(this.scene.sceneList, this);
+	}
 }
 
-/*
-function gBackground(){//fill the hole background with one Image, in a loop
-	
-}
-*/
 
 
 function camera(){
@@ -336,7 +329,11 @@ function vector2D(x0, x1){
 		return "(" + this.x0 + "|" + this.x1 + ")";
 	}
 
- 
+	this.copy = function(){
+		newVector = new vector2D(0, 0);
+		newVector.add(this);
+		return newVector;
+	}
 }
 
 
@@ -363,6 +360,14 @@ setting.BOTTOM = 1;
 // the components
 
 function componentCollide(){
+
+	this.init = function(){
+		this.gpObject.addParameter("position",	new vector2D(0, 0));
+		this.gpObject.addParameter("size", 		new vector2D(0, 0));
+
+		this.gpObject.addParameter("onCollide", null);
+	}
+
 	this.draw = function(camera){
 		if(this.gpObject.onCollide != null){ //don't even test if there is no collide function
 			for (var i = 0; i < this.gpObject.scene.objectList.length; i++) {//check every object from the scene
@@ -380,6 +385,12 @@ function componentCollide(){
 }
 
 function componentMovement(){
+
+	this.init = function(){
+		this.gpObject.addParameter("move",		new vector2D(0, 0));
+		this.gpObject.addParameter("position",	new vector2D(0, 0));
+	}
+
 	this.draw = function(camera){ // width and height, movement etc
 
 		ScreenPosition = camera.getScreenPosition(this.gpObject.position)
@@ -395,6 +406,15 @@ function componentMovement(){
 
 
 function componentAdjustSize(){
+
+	this.init = function(){
+		this.gpObject.addParameter("size",	new vector2D(0, 0));
+
+		this.gpObject.addParameter("image", 	null);
+		this.gpObject.addParameter("fixWidth", 	true);
+		this.gpObject.addParameter("fixHeight", true);
+	}
+
 	this.draw = function(camera){ // width and height
 
 		if(this.gpObject.image != null){//if there is a Image
@@ -414,20 +434,42 @@ function componentAdjustSize(){
 }
 
 function componentBasicDraw(){
-	this.draw = function(camera){
-			
-		ScreenPosition = camera.getScreenPosition(this.gpObject.position)
+	this.init = function(){
 
-		if(this.gpObject.image != null){//if there is a Image
-			camera.context.drawImage(this.gpObject.image, ScreenPosition.x0, ScreenPosition.x1, this.gpObject.size.x0*camera.zoomFactor, this.gpObject.size.x1*camera.zoomFactor);
-		}else{
-			camera.context.fillStyle = this.gpObject.color;
-			camera.context.fillRect(ScreenPosition.x0, ScreenPosition.x1, this.gpObject.size.x0*camera.zoomFactor, this.gpObject.size.x1*camera.zoomFactor);
+
+		this.gpObject.addParameter("position",	new vector2D(0, 0));
+		this.gpObject.addParameter("size", 		new vector2D(0, 0));
+
+		this.gpObject.addParameter("color", 	"red");
+		this.gpObject.addParameter("image", 	null);
+
+		this.gpObject.addParameter("visible",	true);
+	}
+
+	this.draw = function(camera){
+		if(this.gpObject.visible){
+			ScreenPosition = camera.getScreenPosition(this.gpObject.position)
+
+			if(this.gpObject.image != null){//if there is a Image
+				camera.context.drawImage(this.gpObject.image, ScreenPosition.x0, ScreenPosition.x1, this.gpObject.size.x0*camera.zoomFactor, this.gpObject.size.x1*camera.zoomFactor);
+			}else{
+				camera.context.fillStyle = this.gpObject.color;
+				camera.context.fillRect(ScreenPosition.x0, ScreenPosition.x1, this.gpObject.size.x0*camera.zoomFactor, this.gpObject.size.x1*camera.zoomFactor);
+			}
 		}
 	}
 }
 
 function componentBackground(){
+
+	this.init = function(){
+		this.gpObject.addParameter("position",	new vector2D(0, 0));
+		this.gpObject.addParameter("size", 		new vector2D(0, 0));
+
+		this.gpObject.addParameter("color", 	"red");
+		this.gpObject.addParameter("image", 	null);
+	}
+
 	this.draw = function(camera){
 
 		screenSize = new vector2D(
@@ -451,6 +493,7 @@ function componentBackground(){
 					 screenSize.x0+1, 
 					 screenSize.x1+1);
 				}else{
+					camera.context.fillStyle = this.gpObject.color;
 					camera.context.fillRect(
 						x*screenSize.x0 + offsetX, 
 						y*screenSize.x1 + offsetY, 
@@ -460,6 +503,92 @@ function componentBackground(){
 			};
 		};
 
+	}
+}
+
+
+function componentAdjustSizeGUI(){
+	this.init = function(){
+		this.gpObject.addParameter("position",	new vector2D(0, 0));
+		this.gpObject.addParameter("size",		new vector2D(0, 0));
+
+		this.gpObject.addParameter("positionUI",	new vector2D(0, 0));
+		this.gpObject.addParameter("sizeUI",	new vector2D(0, 0));
+	}
+
+	this.draw = function(camera){
+
+		//translate the screen position(in percent) to world position
+		position = new vector2D(0, 0);
+		position.add(this.gpObject.positionUI);
+
+
+		position.x0 *= camera.canvas.width;	//to px values
+		position.x1 *= camera.canvas.height;
+
+		position.divided(camera.zoomFactor);
+
+		position.add(camera.position);
+
+
+		this.gpObject.position = position;
+
+
+		//translate the screen width(in percent) to world width
+		size = new vector2D(0, 0);
+		size.add(this.gpObject.sizeUI);
+
+		size.x0 *= camera.canvas.width;	//to px values
+		size.x1 *= camera.canvas.height;
+
+		size.divided(camera.zoomFactor);
+
+		this.gpObject.size = size;
+	}
+}
+
+function componentTextDraw(){
+	this.init = function(){
+		this.gpObject.addParameter("text", "");
+		this.gpObject.addParameter("textSize", 12);
+	}
+
+	this.draw = function(camera){
+		camera.context.fillStyle = "black"
+		camera.context.font = this.gpObject.textSize + "px Arial";
+
+		textPosition = camera.getScreenPosition(this.gpObject.position);
+		textPosition.x1+=this.gpObject.textSize;
+
+		camera.context.fillText(this.gpObject.text, textPosition.x0, textPosition.x1);
+	}
+}
+
+function componentFadeIn(){
+	this.init = function(){
+		this.gpObject.addParameter("endColorRGB", [255, 255, 255]);
+		this.gpObject.addParameter("fadeTime", 2000);
+		this.gpObject.addParameter("startTime", 0);
+		
+		this.gpObject.addParameter("fadeIn", function(){
+			this.visible = true;
+			this.startTime = new Date().getTime();
+		})
+
+		this.gpObject.visible = false;
+
+
+	}
+
+	this.draw = function(camera){
+		passedTime =  new Date().getTime() - this.gpObject.startTime;
+		visibilityPercent = Math.min(1, passedTime/this.gpObject.fadeTime);
+		this.gpObject.color = 
+			"rgba(" + this.gpObject.endColorRGB[0] + 
+				"," + this.gpObject.endColorRGB[1] + 
+				"," + this.gpObject.endColorRGB[2] + 
+				"," + visibilityPercent + ")";
+		console.log(this.gpObject.color);
 	}
 }
 

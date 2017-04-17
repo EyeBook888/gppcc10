@@ -14,6 +14,8 @@ RoadImage.src = "./road.png"
 
 function startDriving(roadLength){
 
+	var roadLength = 700*roadLength;
+
 	driverCam = new camera();
 	driverCam.ZoomInToFitWithOf = 700;
 	driverCam.focusPosition = setting.BOTTOM;
@@ -53,7 +55,7 @@ function startDriving(roadLength){
 	driverScene.addGPObject(road);
 	
 	iceDistance = 800;
-	neededIce 	= Math.ceil(roadLength/iceDistance);
+	neededIce 	= Math.floor(roadLength/iceDistance);
 
 	IceBlock = new Array();
 	
@@ -66,9 +68,11 @@ function startDriving(roadLength){
 		IceBlock[i].fixHeight = false;
 		x = Math.round(Math.random()*600-300);
 		y = Math.round(Math.random()*300) - 800;
-		IceBlock[i].position = new vector2D(x , -i*800 + y);
+		IceBlock[i].position = new vector2D(x , Math.max(-i*800 + y, -roadLength));
+		IceBlock[i].addComponent(new componentCollide());
 		IceBlock[i].addComponent(new componentAdjustSize());
 		IceBlock[i].addComponent(new componentBasicDraw());
+
 		driverScene.addGPObject(IceBlock[i]);
 	}
 
@@ -76,17 +80,19 @@ function startDriving(roadLength){
 	//the finish line
 	WinLine = new gpObject();
 	WinLine.size = new vector2D(700, 100);
-	WinLine.color = "blue";
-	WinLine.tag = "gameover"
-	WinLine.color = "green";
+	WinLine.color = "rgba(0, 255, 0, 0.3)";
 	WinLine.onCollide = function(ele){
 		if(ele == player){
-			alert("win");
-			driverScene.drop();
-			startDriving(5000)
+			//alert("win");
+			//driverScene.drop();
+			//startDriving(5)
+			//player.move = new vector2D(0, 0)
+			fadeOut.fadeIn();
+			//player.move.x1 = Math.min(player.move.x1+10, 0);//dirty but it works
+			this.onCollide = function(ele){};
 		}
 	}
-	WinLine.position = new vector2D(-350 , -roadLength);
+	WinLine.position = new vector2D(-350 , -roadLength -WinLine.size.x1);
 	WinLine.addComponent(new componentAdjustSize())
 	WinLine.addComponent(new componentCollide())
 	WinLine.addComponent(new componentBasicDraw())
@@ -103,7 +109,7 @@ function startDriving(roadLength){
 		if(ele == player){
 			alert("gameover");
 			driverScene.drop();
-			startDriving(3000)
+			startDriving(3)
 		}
 	}
 	looseLeftBorder.position = new vector2D(-450 , -roadLength);
@@ -118,9 +124,10 @@ function startDriving(roadLength){
 	looseRightBorder.color = "red";
 	looseRightBorder.onCollide = function(ele){
 		if(ele == player){
-			alert("gameover");
+			//alert("gameover1");
 			driverScene.drop();
-			startDriving(3000)
+			startDriving(3)
+			alert("gameover")
 		}
 	}
 	looseRightBorder.position = new vector2D(350 , -roadLength);
@@ -135,9 +142,10 @@ function startDriving(roadLength){
 	player.size = new vector2D(100, 100);
 	player.onCollide = function(ele){
 		if(ele.tag == "gameover"){
-			alert("gameover");
+			console.log(ele);
 			driverScene.drop();
-			startDriving(3000)
+			startDriving(3)
+			alert("gameover")
 		}
 	}
 	player.position = new vector2D(-50, 0);
@@ -152,6 +160,30 @@ function startDriving(roadLength){
 
 	driverScene.addGPObject(player);
 
+
+	score = new gpObject();
+	score.addComponent(new componentAdjustSizeGUI());
+	score.addComponent(new componentBasicDraw())
+	score.addComponent(new componentTextDraw());
+
+	score.addComponent(new function(){//update the driven km
+		this.draw = function(camera){
+			distance = player.position.x1/-700;
+			distance = Math.round(distance*10)/10;
+
+			this.gpObject.text = distance + "km";
+		}
+	})
+
+	score.color = "white"
+	score.positionUI = new vector2D(0, 0);
+	score.sizeUI = new vector2D(0.3, 0.04);
+	score.text = "0km";
+	driverScene.addGPObject(score);
+
+
+
+
 	
 	cameraFocus = new gpObject();
 	cameraFocus.size = new vector2D(100, 250);
@@ -165,6 +197,17 @@ function startDriving(roadLength){
 	cameraFocus.addComponent(new componentMovement())
 	driverScene.addGPObject(cameraFocus);
 	driverCam.focusTo = cameraFocus;
+
+
+	fadeOut = new gpObject();
+	fadeOut.sizeUI = new vector2D(1, 1)
+	fadeOut.endColorRGB = [100, 100, 255]
+	fadeOut.positionUI = new vector2D(0, 0)
+	fadeOut.fadeTime = 2000
+	fadeOut.addComponent(new componentFadeIn())
+	fadeOut.addComponent(new componentAdjustSizeGUI());
+	fadeOut.addComponent(new componentBasicDraw())
+	driverScene.addGPObject(fadeOut);
 		
 }
 
@@ -172,4 +215,4 @@ if(Interval == null){
 		Interval = setInterval(function(){myGame.update();}, Math.floor(1000/30));
 }
 
-startDriving(3000)
+startDriving(3)

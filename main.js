@@ -1,6 +1,9 @@
 myGame = new game(document.getElementById("game"));
 Interval = null;
 
+
+
+// -------------- core Loop ------------
 //loading the Images
 PlayerImage = new Image();
 PlayerImage.src = "./player.png"
@@ -42,7 +45,7 @@ function startDriving(roadLength){
 	
 	
 	myGame.addScene(driverScene);
-	
+	myGame.activeScene = driverScene.id;
 	
 	road = new gpObject();
 	road.size = new vector2D(600, 100);
@@ -83,10 +86,6 @@ function startDriving(roadLength){
 	WinLine.color = "rgba(0, 255, 0, 0.3)";
 	WinLine.onCollide = function(ele){
 		if(ele == player){
-			//alert("win");
-			//driverScene.drop();
-			//startDriving(5)
-			//player.move = new vector2D(0, 0)
 			fadeOut.fadeIn();
 			//player.move.x1 = Math.min(player.move.x1+10, 0);//dirty but it works
 			this.onCollide = function(ele){};
@@ -107,9 +106,8 @@ function startDriving(roadLength){
 	looseLeftBorder.color = "red";
 	looseLeftBorder.onCollide = function(ele){
 		if(ele == player){
-			alert("gameover");
-			driverScene.drop();
-			startDriving(3)
+			gameover();
+			this.onCollide = function(ele){};
 		}
 	}
 	looseLeftBorder.position = new vector2D(-450 , -roadLength);
@@ -124,10 +122,8 @@ function startDriving(roadLength){
 	looseRightBorder.color = "red";
 	looseRightBorder.onCollide = function(ele){
 		if(ele == player){
-			//alert("gameover1");
-			driverScene.drop();
-			startDriving(3)
-			alert("gameover")
+			gameover();
+			this.onCollide = function(ele){};
 		}
 	}
 	looseRightBorder.position = new vector2D(350 , -roadLength);
@@ -142,10 +138,8 @@ function startDriving(roadLength){
 	player.size = new vector2D(100, 100);
 	player.onCollide = function(ele){
 		if(ele.tag == "gameover"){
-			console.log(ele);
-			driverScene.drop();
-			startDriving(3)
-			alert("gameover")
+			gameover();
+			this.onCollide = function(ele){};
 		}
 	}
 	player.position = new vector2D(-50, 0);
@@ -208,11 +202,69 @@ function startDriving(roadLength){
 	fadeOut.addComponent(new componentAdjustSizeGUI());
 	fadeOut.addComponent(new componentBasicDraw())
 	driverScene.addGPObject(fadeOut);
+	fadeOut.onFadeIn = function(){
+		driverScene.drop();
+
+		//open the menu
+		myGame.activeScene = menuScene.id;
+	}
+	
 		
 }
 
-if(Interval == null){
-		Interval = setInterval(function(){myGame.update();}, Math.floor(1000/30));
+function gameover(){
+	//alert("gameover");
+	player.move = new vector2D(0, 0)
+	fadeOut.fadeIn();
 }
+
+
+if(Interval == null){
+		Interval = setInterval(function(){myGame.update();}, Math.floor(1000/60));
+}
+
+
+
+
+
+//-------------- menu --------------
+
+
+
+menuCam = new camera();
+menuCam.ZoomInToFitWithOf = 700;
+menuCam.focusPosition = setting.BOTTOM;
+
+
+menuScene = new scene(menuCam)
+myGame.addScene(menuScene);
+
+
+//the background
+MenuBackground = new gpObject();
+MenuBackground.sizeUI = new vector2D(1, 1)
+MenuBackground.positionUI = new vector2D(0, 0)
+MenuBackground.addComponent(new componentAdjustSizeGUI());
+MenuBackground.addComponent(new componentBasicDraw())
+MenuBackground.color = "rgb(100, 100, 255)";
+menuScene.addGPObject(MenuBackground)
+
+missionButton = new gpObject();
+missionButton.sizeUI = new vector2D(0.6, 0.1)
+missionButton.positionUI = new vector2D(0.2, 0.2)
+missionButton.addComponent(new componentAdjustSizeGUI());
+missionButton.addComponent(new componentBasicDraw())
+missionButton.addComponent(new componentTextDraw())
+missionButton.addComponent(new componentClick())
+missionButton.color = "rgb(255, 255, 255)";
+missionButton.text = "Start"
+missionButton.onClick = function(){
+	startDriving(10)
+}
+menuScene.addGPObject(missionButton)
+
+
+//----------------------------------
+
 
 startDriving(3)

@@ -9,7 +9,6 @@ function preventMotion(event){
 }
 
 
-
 function game(canvas){
 
 	this.sceneList		= new Array();
@@ -91,13 +90,17 @@ function game(canvas){
 	controlStartPosition = null;//for the height Level events
 
 	this.controlStart = function(position){//touchstart event for smart phone and mouse down on PC
-		controlStartPosition = position;
+		relativPosition = position.copy();
+		
+		relativPosition.x0 /= this.canvas.width;
+		relativPosition.x1 /= this.canvas.height;
 
-		for (var i = 0; i < this.sceneList.length; i++) {//go to all element and trigger the event
-			if(this.sceneList[i].controlStart != null){
-				this.sceneList[i].controlStart(position)
-			}
-		};
+		controlStartPosition = position;
+		
+		if(this.sceneList[this.activeScene].controlStart != null){
+			this.sceneList[this.activeScene].controlStart(relativPosition)
+		}
+
 	}
 
 	this.controlEnd = function(position){//touchend event for smart phone and mouse up on PC
@@ -147,9 +150,13 @@ function game(canvas){
 	}
 
 
+	this.lastFrame = new Date().getTime();//for the deltaTime
 
 	this.update = function(){//handle for example the draw call
-		deltaTime = 1000/30;
+		newTime =  new Date().getTime();
+
+		deltaTime = newTime - this.lastFrame;
+		this.lastFrame = newTime;
 
 		//make the canvas fit the window
 		this.canvas.width = window.innerWidth;
@@ -191,6 +198,15 @@ function scene(camera){
 
 	this.drop = function(){
 		this.game.sceneList = remove(this.game.sceneList, this);
+	}
+
+	this.controlStart = function(position){//default: go to all objects and trigger the handleClick if it has
+		console.log("click9");
+		for (var i = 0; i < this.objectList.length; i++) {
+			if(this.objectList[i].handleClick != null){
+				this.objectList[i].handleClick(position)
+			}
+		}
 	}
 
 }
@@ -567,12 +583,16 @@ function componentTextDraw(){
 function componentFadeIn(){
 	this.init = function(){
 		this.gpObject.addParameter("endColorRGB", [255, 255, 255]);
-		this.gpObject.addParameter("fadeTime", 2000);
+		this.gpObject.addParameter("fadeTime",  2000);
 		this.gpObject.addParameter("startTime", 0);
+
+		this.gpObject.addParameter("onFadeIn",  null);
+		this.gpObject.addParameter("alreadyTriggeredOnFadeIn", true);
 		
 		this.gpObject.addParameter("fadeIn", function(){
 			this.visible = true;
 			this.startTime = new Date().getTime();
+			this.alreadyTriggeredOnFadeIn = false;
 		})
 
 		this.gpObject.visible = false;
@@ -583,12 +603,44 @@ function componentFadeIn(){
 	this.draw = function(camera){
 		passedTime =  new Date().getTime() - this.gpObject.startTime;
 		visibilityPercent = Math.min(1, passedTime/this.gpObject.fadeTime);
+
+		if(visibilityPercent == 1 && !this.gpObject.alreadyTriggeredOnFadeIn){//trigger the onFadeIn event
+			this.gpObject.alreadyTriggeredOnFadeIn = true;
+			if(this.gpObject.onFadeIn != null){
+				this.gpObject.onFadeIn();
+			}
+		}
+
 		this.gpObject.color = 
 			"rgba(" + this.gpObject.endColorRGB[0] + 
 				"," + this.gpObject.endColorRGB[1] + 
 				"," + this.gpObject.endColorRGB[2] + 
 				"," + visibilityPercent + ")";
-		console.log(this.gpObject.color);
 	}
 }
+
+function componentClick(){
+	this.init = function(){
+
+		this.gpObject.addParameter("positionUI",	new vector2D(0, 0));
+		this.gpObject.addParameter("sizeUI",	new vector2D(0, 0));
+		
+		this.gpObject.addParameter("handleClick", function(position){
+			console.log(position.x0 + ">=" + this.positionUI.x0);
+			if(	position.x0 >= this.positionUI.x0 &&
+				position.x0 <= this.positionUI.x0 + this.sizeUI.x0 &&
+				position.x1 >= this.positionUI.x1 &&
+				position.x1 <= this.positionUI.x1 + this.sizeUI.x1 
+				){
+				this.onClick();
+				console.log("click11");
+			}
+			
+		});
+
+
+		this.gpObject.addParameter("onClick",  function(){});
+	}
+}
+
 

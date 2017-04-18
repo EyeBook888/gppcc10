@@ -350,6 +350,10 @@ function vector2D(x0, x1){
 		newVector.add(this);
 		return newVector;
 	}
+
+	this.equal = function(vector){
+		return this.x0 == vector.x0 && this.x1 == vector.x1;
+	}
 }
 
 
@@ -370,8 +374,9 @@ function remove(array, element){
 setting = new Array();
 setting.CENTER = 0;
 setting.BOTTOM = 1;
-
-
+setting.LEFT = 2;
+setting.RIGHT = 3;
+setting.DYNAMIC = 123123;
 
 // the components
 
@@ -567,16 +572,58 @@ function componentTextDraw(){
 	this.init = function(){
 		this.gpObject.addParameter("text", "");
 		this.gpObject.addParameter("textSize", 12);
+		this.gpObject.addParameter("textAlign", setting.CENTER);
+
+		this.oldSize = new vector2D(0, 0)//to check if the element has an other size on the screen
 	}
 
 	this.draw = function(camera){
 		camera.context.fillStyle = "black"
-		camera.context.font = this.gpObject.textSize + "px Arial";
+
+		if(this.gpObject.textSize == setting.DYNAMIC){
+			if(! this.gpObject.size.equal(this.oldSize)){
+
+				this.oldSize = this.gpObject.size.copy();
+				//new text size
+
+				this.actualFontSize = 0;
+				camera.context.font = this.actualFontSize + "px Arial";
+
+				while(
+					camera.context.measureText(this.gpObject.text).width < this.gpObject.size.x0*camera.zoomFactor &&
+					this.actualFontSize <  this.gpObject.size.x1*camera.zoomFactor){
+					console.log(camera.context.measureText(this.gpObject.text).width + "<" + this.gpObject.size.x0);
+					this.actualFontSize++;
+					camera.context.font = this.actualFontSize + "px Arial";
+				}
+			}
+		}else{
+			this.actualFontSize = this.gpObject.textSize;
+		}
+
+		camera.context.font = this.actualFontSize + "px Arial";
 
 		textPosition = camera.getScreenPosition(this.gpObject.position);
 		textPosition.x1+=this.gpObject.textSize;
 
+		textWidth = camera.context.measureText(this.gpObject.text).width
+
+		if(this.gpObject.textAlign == setting.LEFT){
+			textPosition = camera.getScreenPosition(this.gpObject.position);
+			textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
+		}else if(this.gpObject.textAlign == setting.RIGHT){
+			textPosition = camera.getScreenPosition(this.gpObject.position);
+			textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
+			textPosition.x0+=this.gpObject.size.x0*camera.zoomFactor-textWidth;
+		}else if(this.gpObject.textAlign == setting.CENTER){
+			textPosition = camera.getScreenPosition(this.gpObject.position);
+			textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
+			textPosition.x0+=(this.gpObject.size.x0*camera.zoomFactor-textWidth)/2;
+		}
+
+		
 		camera.context.fillText(this.gpObject.text, textPosition.x0, textPosition.x1);
+		
 	}
 }
 

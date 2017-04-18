@@ -164,6 +164,9 @@ function startDriving(roadLength){
 		this.draw = function(camera){
 			distance = player.position.x1/-700;
 			distance = Math.round(distance*10)/10;
+			if(distance%1 == 0){
+				distance = distance + ".0"
+			}
 
 			this.gpObject.text = distance + "km";
 		}
@@ -173,6 +176,8 @@ function startDriving(roadLength){
 	score.positionUI = new vector2D(0, 0);
 	score.sizeUI = new vector2D(0.3, 0.04);
 	score.text = "0km";
+	score.textAlign = setting.RIGHT;
+	score.textSize = setting.DYNAMIC;
 	driverScene.addGPObject(score);
 
 
@@ -261,10 +266,12 @@ missionButton.text = "Start"
 missionButton.onClick = function(){
 	startDriving(10)
 }
+missionButton.textAlign = setting.CENTER;
+missionButton.textSize = setting.DYNAMIC;
 menuScene.addGPObject(missionButton)
 
 
 //----------------------------------
 
 
-startDriving(3)
+//startDriving(3)

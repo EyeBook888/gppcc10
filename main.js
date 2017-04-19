@@ -32,7 +32,7 @@ function startDriving(roadLength){
 	driverCam = new camera();
 	driverCam.ZoomInToFitWithOf = 700;
 	driverCam.focusPosition = setting.BOTTOM;
-	driverScene = new scene(driverCam)
+	driverScene = new scene(driverCam);
 	
 	
 	driverScene.pullLeft = function(){
@@ -299,7 +299,7 @@ snow = new Array();
 	
 for(i = 0; i <= 60; i++){
 	snow[i] = new gpObject();
-	snow[i].size = new vector2D(50, 50);
+	snow[i].size = new vector2D(15, 15);
 	snow[i].color = "white";
 	snow[i].tag = "gameover"
 	snow[i].image = snowImage;
@@ -330,22 +330,162 @@ for(i = 0; i <= 60; i++){
 
 missionButton = new gpObject();
 missionButton.sizeUI = new vector2D(0.6, 0.1)
-missionButton.positionUI = new vector2D(0.2, 0.2)
+missionButton.positionUI = new vector2D(0.2, 0.1)
 missionButton.addComponent(new componentAdjustSizeGUI());
 missionButton.addComponent(new componentBasicDraw())
 missionButton.addComponent(new componentTextDraw())
 missionButton.addComponent(new componentClick())
 missionButton.color = "rgb(255, 255, 255)";
-missionButton.text = "Start"
+missionButton.text = "mission"
 missionButton.onClick = function(){
-	startDriving(10)
+	myGame.activeScene = missionSelectScene.id;
 }
 missionButton.textAlign = setting.CENTER;
 missionButton.textSize = setting.DYNAMIC;
 menuScene.addGPObject(missionButton)
 
 
-//----------------------------------
+
+carShop = new gpObject();
+carShop.sizeUI = new vector2D(0.6, 0.1)
+carShop.positionUI = new vector2D(0.2, 0.25)
+carShop.addComponent(new componentAdjustSizeGUI());
+carShop.addComponent(new componentBasicDraw())
+carShop.addComponent(new componentTextDraw())
+carShop.addComponent(new componentClick())
+carShop.color = "rgb(255, 255, 255)";
+carShop.text = "car shop"
+carShop.onClick = function(){
+	myGame.activeScene = shopScene.id;
+}
+carShop.textAlign = setting.CENTER;
+carShop.textSize = setting.DYNAMIC;
+menuScene.addGPObject(carShop)
+
+//local authorities
+
+authorities = new gpObject();
+authorities.sizeUI = new vector2D(0.6, 0.1)
+authorities.positionUI = new vector2D(0.2, 0.4)
+authorities.addComponent(new componentAdjustSizeGUI());
+authorities.addComponent(new componentBasicDraw())
+authorities.addComponent(new componentTextDraw())
+authorities.addComponent(new componentClick())
+authorities.color = "rgb(255, 255, 255)";
+authorities.text = "local authorities"
+authorities.onClick = function(){
+	alert("coming soon");
+}
+authorities.textAlign = setting.CENTER;
+authorities.textSize = setting.DYNAMIC;
+menuScene.addGPObject(authorities)
 
 
-//startDriving(3)
+
+//-------------- shop --------------
+
+shopCam = new camera();
+shopCam.ZoomInToFitWithOf = 700;
+shopCam.focusPosition = setting.BOTTOM;
+
+
+shopScene = new scene(shopCam)
+myGame.addScene(shopScene);
+
+
+//the background
+shopBackground = new gpObject();
+shopBackground.sizeUI = new vector2D(1, 1)
+shopBackground.positionUI = new vector2D(0, 0)
+shopBackground.addComponent(new componentAdjustSizeGUI());
+shopBackground.addComponent(new componentBasicDraw())
+shopBackground.color = "rgb(0, 191, 255)";
+shopScene.addGPObject(shopBackground)
+
+
+
+offerBackground = new Array();
+i = 0;
+for(x = 0; x < 3; x++){
+	for(y = 0; y < 3; y++){
+		offerBackground[i] = new gpObject();
+		offerBackground[i].sizeUI = new vector2D(0.3, 0.27)
+		offerBackground[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115)
+		offerBackground[i].addComponent(new componentAdjustSizeGUI());
+		offerBackground[i].addComponent(new componentBasicDraw())
+		offerBackground[i].color = "rgb(255, 255, 255)";
+		shopScene.addGPObject(offerBackground[i])
+		i++;
+	}
+
+}
+
+shopBack = new gpObject();
+shopBack.sizeUI = new vector2D(0.2, 0.05)
+shopBack.positionUI = new vector2D(0.01, 0.01)
+shopBack.addComponent(new componentAdjustSizeGUI());
+shopBack.addComponent(new componentBasicDraw())
+shopBack.addComponent(new componentClick())
+shopBack.color = "rgb(255, 255, 255)";
+shopBack.onClick = function(){
+	myGame.activeScene = menuScene.id;
+}
+shopScene.addGPObject(shopBack)
+
+
+
+
+//------------ mission select ------------
+
+missionSelectCam = new camera();
+missionSelectCam.ZoomInToFitWithOf = 700;
+
+
+missionSelectScene = new scene(missionSelectCam)
+myGame.addScene(missionSelectScene);
+
+
+//the background
+missionSelectBackground = new gpObject();
+missionSelectBackground.sizeUI = new vector2D(1, 1)
+missionSelectBackground.positionUI = new vector2D(0, 0)
+missionSelectBackground.addComponent(new componentAdjustSizeGUI());
+missionSelectBackground.addComponent(new componentBasicDraw())
+missionSelectBackground.color = "rgb(0, 191, 255)";
+missionSelectScene.addGPObject(missionSelectBackground)
+
+
+
+missionOfferBackground = new Array();
+for(i = 0; i < 9; i++){
+	missionOfferBackground[i] = new gpObject();
+	missionOfferBackground[i].sizeUI = new vector2D(0.9, 1/10-0.01)
+	missionOfferBackground[i].positionUI = new vector2D(0.05, i*(1/10) + 0.1);
+	missionOfferBackground[i].addComponent(new componentAdjustSizeGUI());
+	missionOfferBackground[i].addComponent(new componentBasicDraw())
+	missionOfferBackground[i].addComponent(new componentTextDraw())
+	missionOfferBackground[i].addComponent(new componentClick())
+	missionOfferBackground[i].color = "rgb(255, 255, 255)";
+	missionOfferBackground[i].textSize = setting.DYNAMIC;
+	missionOfferBackground[i].number = i;
+	missionOfferBackground[i].text = ((i+1)*2) + "km";
+	missionOfferBackground[i].onClick = function(){
+		startDriving((this.number+1)*2)
+	}
+	missionSelectScene.addGPObject(missionOfferBackground[i])
+}
+
+
+
+missionSelectBack = new gpObject();
+missionSelectBack.sizeUI = new vector2D(0.2, 0.05)
+missionSelectBack.positionUI = new vector2D(0.01, 0.01)
+missionSelectBack.addComponent(new componentAdjustSizeGUI());
+missionSelectBack.addComponent(new componentBasicDraw())
+missionSelectBack.addComponent(new componentClick())
+missionSelectBack.color = "rgb(255, 255, 255)";
+missionSelectBack.onClick = function(){
+	myGame.activeScene = menuScene.id;
+}
+missionSelectScene.addGPObject(missionSelectBack)
+

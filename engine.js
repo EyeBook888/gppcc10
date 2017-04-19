@@ -395,7 +395,7 @@ function componentCollide(){
 				currentObject = this.gpObject.scene.objectList[i];
 				if (this.gpObject.position.x0 < currentObject.position.x0 + currentObject.size.x0 &&
   					this.gpObject.position.x0 + this.gpObject.size.x0 > currentObject.position.x0 &&
-   					this.gpObject.position.x1 < currentObject.position.x1 &&
+   					this.gpObject.position.x1 < currentObject.position.x1 + currentObject.size.x1&&
    					this.gpObject.position.x1 + this.gpObject.size.x1 > currentObject.position.x1
    					) {
 						this.gpObject.onCollide(currentObject);
@@ -573,6 +573,7 @@ function componentTextDraw(){
 		this.gpObject.addParameter("text", "");
 		this.gpObject.addParameter("textSize", 12);
 		this.gpObject.addParameter("textAlign", setting.CENTER);
+		this.gpObject.addParameter("border", 0.1);//in percent
 
 		this.oldSize = new vector2D(0, 0)//to check if the element has an other size on the screen
 	}
@@ -589,12 +590,13 @@ function componentTextDraw(){
 				this.actualFontSize = 0;
 				camera.context.font = this.actualFontSize + "px Arial";
 
-				while(
-					camera.context.measureText(this.gpObject.text).width < this.gpObject.size.x0*camera.zoomFactor &&
-					this.actualFontSize <  this.gpObject.size.x1*camera.zoomFactor){
-					console.log(camera.context.measureText(this.gpObject.text).width + "<" + this.gpObject.size.x0);
-					this.actualFontSize++;
-					camera.context.font = this.actualFontSize + "px Arial";
+				while(																					//border
+					camera.context.measureText(this.gpObject.text).width < (this.gpObject.size.x0 - (this.gpObject.size.x0*this.gpObject.border))*camera.zoomFactor &&
+					this.actualFontSize <  (this.gpObject.size.x1 - (this.gpObject.size.x1*this.gpObject.border))*camera.zoomFactor){
+
+						console.log(camera.context.measureText(this.gpObject.text).width + "<" + this.gpObject.size.x0);
+						this.actualFontSize++;
+						camera.context.font = this.actualFontSize + "px Arial";
 				}
 			}
 		}else{

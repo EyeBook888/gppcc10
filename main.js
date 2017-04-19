@@ -14,6 +14,12 @@ IceImage.src = "./ice.png";
 RoadImage = new Image();
 RoadImage.src = "./road.png"
 
+bridgeLeftImage = new Image();
+bridgeLeftImage.src = "./bridgeLeft.png"
+
+bridgeRightImage = new Image();
+bridgeRightImage.src = "./bridgeRight.png"
+
 
 function startDriving(roadLength){
 
@@ -78,6 +84,35 @@ function startDriving(roadLength){
 
 		driverScene.addGPObject(IceBlock[i]);
 	}
+
+	//bridge
+	y = Math.round(Math.random()*300) - 800;
+
+	bridgeLeft = new gpObject();
+	bridgeLeft.size = new vector2D(350, 00);
+	bridgeLeft.color = "blue";
+	bridgeLeft.tag = "gameover"
+	bridgeLeft.image = bridgeLeftImage;
+	bridgeLeft.fixHeight = false;
+	bridgeLeft.position = new vector2D(-500 , -1000);
+	bridgeLeft.addComponent(new componentCollide());
+	bridgeLeft.addComponent(new componentAdjustSize());
+	bridgeLeft.addComponent(new componentBasicDraw());
+	driverScene.addGPObject(bridgeLeft);
+
+
+	bridgeRight = new gpObject();
+	bridgeRight.size = new vector2D(350, 00);
+	bridgeRight.color = "blue";
+	bridgeRight.tag = "gameover"
+	bridgeRight.image = bridgeRightImage;
+	bridgeRight.fixHeight = false;
+	bridgeRight.position = new vector2D(150 , -1000);
+	bridgeRight.addComponent(new componentCollide());
+	bridgeRight.addComponent(new componentAdjustSize());
+	bridgeRight.addComponent(new componentBasicDraw());
+	driverScene.addGPObject(bridgeRight);
+
 
 
 	//the finish line
@@ -200,7 +235,7 @@ function startDriving(roadLength){
 
 	fadeOut = new gpObject();
 	fadeOut.sizeUI = new vector2D(1, 1)
-	fadeOut.endColorRGB = [100, 100, 255]
+	fadeOut.endColorRGB = [0, 191, 255]
 	fadeOut.positionUI = new vector2D(0, 0)
 	fadeOut.fadeTime = 2000
 	fadeOut.addComponent(new componentFadeIn())
@@ -220,6 +255,7 @@ function startDriving(roadLength){
 function gameover(){
 	//alert("gameover");
 	player.move = new vector2D(0, 0)
+	fadeOut.fadeTime = 500
 	fadeOut.fadeIn();
 }
 
@@ -251,7 +287,7 @@ MenuBackground.sizeUI = new vector2D(1, 1)
 MenuBackground.positionUI = new vector2D(0, 0)
 MenuBackground.addComponent(new componentAdjustSizeGUI());
 MenuBackground.addComponent(new componentBasicDraw())
-MenuBackground.color = "rgb(100, 100, 255)";
+MenuBackground.color = "rgb(0, 191, 255)";
 menuScene.addGPObject(MenuBackground)
 
 missionButton = new gpObject();

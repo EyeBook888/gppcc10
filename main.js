@@ -86,7 +86,7 @@ function startDriving(roadLength){
 	}
 
 	//bridge
-	y = Math.round(Math.random()*300) - 800;
+	y = -Math.round(Math.random()*roadLength);
 
 	bridgeLeft = new gpObject();
 	bridgeLeft.size = new vector2D(350, 00);
@@ -94,7 +94,7 @@ function startDriving(roadLength){
 	bridgeLeft.tag = "gameover"
 	bridgeLeft.image = bridgeLeftImage;
 	bridgeLeft.fixHeight = false;
-	bridgeLeft.position = new vector2D(-500 , -1000);
+	bridgeLeft.position = new vector2D(-500 , y);
 	bridgeLeft.addComponent(new componentCollide());
 	bridgeLeft.addComponent(new componentAdjustSize());
 	bridgeLeft.addComponent(new componentBasicDraw());
@@ -107,7 +107,7 @@ function startDriving(roadLength){
 	bridgeRight.tag = "gameover"
 	bridgeRight.image = bridgeRightImage;
 	bridgeRight.fixHeight = false;
-	bridgeRight.position = new vector2D(150 , -1000);
+	bridgeRight.position = new vector2D(150 , y);
 	bridgeRight.addComponent(new componentCollide());
 	bridgeRight.addComponent(new componentAdjustSize());
 	bridgeRight.addComponent(new componentBasicDraw());

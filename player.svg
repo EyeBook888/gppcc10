@@ -753,6 +753,18 @@
        y1="1220.0475"
        x2="-707.10675"
        y2="1220.0475" />
+    <filter
+       inkscape:collect="always"
+       id="filter4090"
+       x="-0.36"
+       width="1.72"
+       y="-0.36"
+       height="1.72">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.4285715"
+         id="feGaussianBlur4092" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -761,9 +773,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="-401.8994"
-     inkscape:cy="173.78657"
+     inkscape:zoom="0.7"
+     inkscape:cx="-259.04226"
+     inkscape:cy="230.92943"
      inkscape:document-units="px"
      inkscape:current-layer="g3824"
      showgrid="false"
@@ -2070,6 +2082,19 @@
              id="rect4133"
              style="fill:url(#linearGradient4333);fill-opacity:1;stroke:none" />
         </g>
+        <path
+           sodipodi:type="arc"
+           style="fill:#e9e9ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;filter:url(#filter4090)"
+           id="path3304"
+           sodipodi:cx="72.85714"
+           sodipodi:cy="848.07648"
+           sodipodi:rx="21.428572"
+           sodipodi:ry="21.428572"
+           d="m 94.285711,848.07648 a 21.428572,21.428572 0 1 1 -42.857143,0 21.428572,21.428572 0 1 1 42.857143,0 z"
+           transform="translate(4.4063169e-7,-66.428573)"
+           inkscape:export-filename="/Users/jonadirks/Bibliothek/HTML/#gppcc10/snow.png"
+           inkscape:export-xdpi="349"
+           inkscape:export-ydpi="349" />
       </g>
     </g>
   </g>

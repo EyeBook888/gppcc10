@@ -21,6 +21,10 @@ bridgeRightImage = new Image();
 bridgeRightImage.src = "./bridgeRight.png"
 
 
+snowImage = new Image();
+snowImage.src = "./snow.png"
+
+
 function startDriving(roadLength){
 
 	var roadLength = 700*roadLength;
@@ -289,6 +293,40 @@ MenuBackground.addComponent(new componentAdjustSizeGUI());
 MenuBackground.addComponent(new componentBasicDraw())
 MenuBackground.color = "rgb(0, 191, 255)";
 menuScene.addGPObject(MenuBackground)
+
+//snow
+snow = new Array();
+	
+for(i = 0; i <= 60; i++){
+	snow[i] = new gpObject();
+	snow[i].size = new vector2D(50, 50);
+	snow[i].color = "white";
+	snow[i].tag = "gameover"
+	snow[i].image = snowImage;
+	snow[i].fixHeight = false;
+	x = (Math.random()*700*2)-700;;
+	y = 10000;
+	snow[i].position = new vector2D(x, y);
+	snow[i].addComponent(new componentMovement());
+	snow[i].addComponent(new componentAdjustSize());
+	snow[i].addComponent(new componentBasicDraw());
+
+	snow[i].addComponent(new function(){
+		this.draw = function(camera){
+			if(this.gpObject.position.x1 >= camera.canvas.height / camera.zoomFactor){
+				x = (Math.random()*700*2)-700;
+				y = - Math.random()* (camera.canvas.height / camera.zoomFactor);
+				this.gpObject.position = new vector2D(x, y);
+			}
+		}
+	});
+
+	snow[i].move = new vector2D(0.1, 0.5)
+	menuScene.addGPObject(snow[i]);
+}
+
+
+
 
 missionButton = new gpObject();
 missionButton.sizeUI = new vector2D(0.6, 0.1)

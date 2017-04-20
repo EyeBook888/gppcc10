@@ -594,7 +594,6 @@ function componentTextDraw(){
 					camera.context.measureText(this.gpObject.text).width < (this.gpObject.size.x0 - (this.gpObject.size.x0*this.gpObject.border))*camera.zoomFactor &&
 					this.actualFontSize <  (this.gpObject.size.x1 - (this.gpObject.size.x1*this.gpObject.border))*camera.zoomFactor){
 
-						console.log(camera.context.measureText(this.gpObject.text).width + "<" + this.gpObject.size.x0);
 						this.actualFontSize++;
 						camera.context.font = this.actualFontSize + "px Arial";
 				}
@@ -674,8 +673,7 @@ function componentClick(){
 		this.gpObject.addParameter("positionUI",	new vector2D(0, 0));
 		this.gpObject.addParameter("sizeUI",	new vector2D(0, 0));
 		
-		this.gpObject.addParameter("handleClick", function(position){
-			console.log(position.x0 + ">=" + this.positionUI.x0);
+		this.gpObject.addParameter("handleClick", function(position){ 
 			if(	position.x0 >= this.positionUI.x0 &&
 				position.x0 <= this.positionUI.x0 + this.sizeUI.x0 &&
 				position.x1 >= this.positionUI.x1 &&

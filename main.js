@@ -1,3 +1,9 @@
+
+savegame = new Array();//everything the has to be save to recreate a game
+savegame.money = 0;
+
+
+
 myGame = new game(document.getElementById("game"));
 Interval = null;
 
@@ -5,8 +11,11 @@ Interval = null;
 
 // -------------- core Loop ------------
 //loading the Images
-PlayerImage = new Image();
-PlayerImage.src = "./player.png"
+truckImage = new Image();
+truckImage.src = "./truck.png"
+
+vwImage = new Image();
+vwImage.src = "./vw.png"
 	
 IceImage = new Image();
 IceImage.src = "./ice.png";
@@ -24,6 +33,18 @@ bridgeRightImage.src = "./bridgeRight.png"
 snowImage = new Image();
 snowImage.src = "./snow.png"
 
+function car(name, image, width){
+	this.image = image;
+	this.width = width;
+	this.name = name;
+}
+
+
+carList = new Array();
+carList.push(new car("Käfer", vwImage, 60));
+carList.push(new car("Truck", truckImage, 100));
+
+currentCar = carList[0];
 
 function startDriving(roadLength){
 
@@ -126,6 +147,7 @@ function startDriving(roadLength){
 	WinLine.onCollide = function(ele){
 		if(ele == player){
 			fadeOut.fadeIn();
+			savegame.money+=Math.round(roadLength/100);
 			//player.move.x1 = Math.min(player.move.x1+10, 0);//dirty but it works
 			this.onCollide = function(ele){};
 		}
@@ -174,7 +196,7 @@ function startDriving(roadLength){
 	
 	
 	player = new gpObject();
-	player.size = new vector2D(100, 100);
+	player.size = new vector2D(currentCar.width, 100);
 	player.onCollide = function(ele){
 		if(ele.tag == "gameover"){
 			gameover();
@@ -182,7 +204,7 @@ function startDriving(roadLength){
 		}
 	}
 	player.position = new vector2D(-50, 0);
-	player.image= PlayerImage;
+	player.image= currentCar.image;
 	player.fixHeight = false;
 	player.move = new vector2D(0, -0.5)
 	
@@ -269,12 +291,86 @@ if(Interval == null){
 }
 
 
+//--------- function for buttons that has to be use over and over again ------
+function createMoneyLable(){
+	Money = new gpObject();
+	Money.sizeUI = new vector2D(0.2, 0.05)
+	Money.positionUI = new vector2D(0.8, 0);
+	Money.addComponent(new componentAdjustSizeGUI());
+	Money.addComponent(new componentBasicDraw())
+	Money.addComponent(new componentTextDraw())
+	Money.addComponent(new function(){
+		this.draw = function(camera){
+			this.gpObject.text = savegame.money + "€";
+		}
+	})
+	Money.color = "rgba(0,0,0,0)";
+	Money.textSize = setting.DYNAMIC;
+	Money.number = i;
+	Money.text = "0€";
+	return Money;
+}
+
+function createBackButton(){
+	back = new gpObject();
+	back.sizeUI = new vector2D(0.2, 0.05)
+	back.positionUI = new vector2D(0.01, 0.01)
+	back.addComponent(new componentAdjustSizeGUI());
+	back.addComponent(new componentBasicDraw())
+	back.addComponent(new componentClick())
+	back.color = "rgb(255, 255, 255)";
+	back.onClick = function(){
+		myGame.activeScene = menuScene.id;
+	}
+	return back;
+}
+
+
+function addBackgroundAndSnow(scene){
+	//the background
+	MenuBackground = new gpObject();
+	MenuBackground.sizeUI = new vector2D(1, 1)
+	MenuBackground.positionUI = new vector2D(0, 0)
+	MenuBackground.addComponent(new componentAdjustSizeGUI());
+	MenuBackground.addComponent(new componentBasicDraw())
+	MenuBackground.color = "rgb(0, 191, 255)";
+	scene.addGPObject(MenuBackground)
+	
+	//snow
+	snow = new Array();
+		
+	for(i = 0; i <= 60; i++){
+		snow[i] = new gpObject();
+		snow[i].size = new vector2D(15, 15);
+		snow[i].color = "white";
+		snow[i].tag = "gameover"
+		snow[i].image = snowImage;
+		snow[i].fixHeight = false;
+		x = (Math.random()*700*2)-700;;
+		y = 10000;
+		snow[i].position = new vector2D(x, y);
+		snow[i].addComponent(new componentMovement());
+		snow[i].addComponent(new componentAdjustSize());
+		snow[i].addComponent(new componentBasicDraw());
+	
+		snow[i].addComponent(new function(){
+			this.draw = function(camera){
+				if(this.gpObject.position.x1 >= camera.canvas.height / camera.zoomFactor){
+					x = (Math.random()*700*2)-700;
+					y = - Math.random()* (camera.canvas.height / camera.zoomFactor);
+					this.gpObject.position = new vector2D(x, y);
+				}
+			}
+		});
+	
+		snow[i].move = new vector2D(0.1, 0.5)
+		scene.addGPObject(snow[i]);
+	}
+}
 
 
 
 //-------------- menu --------------
-
-
 
 menuCam = new camera();
 menuCam.ZoomInToFitWithOf = 700;
@@ -284,49 +380,9 @@ menuCam.focusPosition = setting.BOTTOM;
 menuScene = new scene(menuCam)
 myGame.addScene(menuScene);
 
+addBackgroundAndSnow(menuScene);
 
-//the background
-MenuBackground = new gpObject();
-MenuBackground.sizeUI = new vector2D(1, 1)
-MenuBackground.positionUI = new vector2D(0, 0)
-MenuBackground.addComponent(new componentAdjustSizeGUI());
-MenuBackground.addComponent(new componentBasicDraw())
-MenuBackground.color = "rgb(0, 191, 255)";
-menuScene.addGPObject(MenuBackground)
-
-//snow
-snow = new Array();
-	
-for(i = 0; i <= 60; i++){
-	snow[i] = new gpObject();
-	snow[i].size = new vector2D(15, 15);
-	snow[i].color = "white";
-	snow[i].tag = "gameover"
-	snow[i].image = snowImage;
-	snow[i].fixHeight = false;
-	x = (Math.random()*700*2)-700;;
-	y = 10000;
-	snow[i].position = new vector2D(x, y);
-	snow[i].addComponent(new componentMovement());
-	snow[i].addComponent(new componentAdjustSize());
-	snow[i].addComponent(new componentBasicDraw());
-
-	snow[i].addComponent(new function(){
-		this.draw = function(camera){
-			if(this.gpObject.position.x1 >= camera.canvas.height / camera.zoomFactor){
-				x = (Math.random()*700*2)-700;
-				y = - Math.random()* (camera.canvas.height / camera.zoomFactor);
-				this.gpObject.position = new vector2D(x, y);
-			}
-		}
-	});
-
-	snow[i].move = new vector2D(0.1, 0.5)
-	menuScene.addGPObject(snow[i]);
-}
-
-
-
+menuScene.addGPObject(createMoneyLable());
 
 missionButton = new gpObject();
 missionButton.sizeUI = new vector2D(0.6, 0.1)
@@ -393,44 +449,50 @@ shopScene = new scene(shopCam)
 myGame.addScene(shopScene);
 
 
-//the background
-shopBackground = new gpObject();
-shopBackground.sizeUI = new vector2D(1, 1)
-shopBackground.positionUI = new vector2D(0, 0)
-shopBackground.addComponent(new componentAdjustSizeGUI());
-shopBackground.addComponent(new componentBasicDraw())
-shopBackground.color = "rgb(0, 191, 255)";
-shopScene.addGPObject(shopBackground)
-
-
+addBackgroundAndSnow(shopScene);
+shopScene.addGPObject(createMoneyLable());
 
 offerBackground = new Array();
+offerCarImage = new Array();
 i = 0;
-for(x = 0; x < 3; x++){
-	for(y = 0; y < 3; y++){
-		offerBackground[i] = new gpObject();
-		offerBackground[i].sizeUI = new vector2D(0.3, 0.27)
-		offerBackground[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115)
-		offerBackground[i].addComponent(new componentAdjustSizeGUI());
-		offerBackground[i].addComponent(new componentBasicDraw())
-		offerBackground[i].color = "rgb(255, 255, 255)";
-		shopScene.addGPObject(offerBackground[i])
-		i++;
+for(i = 0; i < carList.length; i++){
+	x = i%3;
+	y = Math.floor(i/3);
+	offerBackground[i] = new gpObject();
+	offerBackground[i].sizeUI = new vector2D(0.3, 0.27)
+	offerBackground[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115)
+	offerBackground[i].addComponent(new componentAdjustSizeGUI());
+	offerBackground[i].addComponent(new componentBasicDraw())
+	offerBackground[i].addComponent(new componentClick())
+	offerBackground[i].carId = i;
+	offerBackground[i].color = "rgb(255, 255, 255)";
+	offerBackground[i].onClick = function(){
+		//change the color to green to show that this this car is selected
+		for (var i = 0; i < offerBackground.length; i++) {
+			offerBackground[i].color = "white";
+		};
+
+		this.color = "green";
+		currentCar = carList[this.carId];
 	}
 
+	shopScene.addGPObject(offerBackground[i])
+	offerCarImage[i] = new gpObject();
+	offerCarImage[i].sizeUI = new vector2D(0.1, 0.27)
+	offerCarImage[i].positionUI = new vector2D(x*0.33 + 0.015 + 0.1, y*0.30 + 0.115)
+	offerCarImage[i].addComponent(new componentAdjustSizeGUI());
+	offerCarImage[i].addComponent(new componentAdjustSize());
+	offerCarImage[i].addComponent(new componentBasicDraw());
+	offerCarImage[i].fixHeight = false;
+	offerCarImage[i].image = carList[i].image;
+	shopScene.addGPObject(offerCarImage[i])
+		
+
+
 }
 
-shopBack = new gpObject();
-shopBack.sizeUI = new vector2D(0.2, 0.05)
-shopBack.positionUI = new vector2D(0.01, 0.01)
-shopBack.addComponent(new componentAdjustSizeGUI());
-shopBack.addComponent(new componentBasicDraw())
-shopBack.addComponent(new componentClick())
-shopBack.color = "rgb(255, 255, 255)";
-shopBack.onClick = function(){
-	myGame.activeScene = menuScene.id;
-}
-shopScene.addGPObject(shopBack)
+
+shopScene.addGPObject(createBackButton())
 
 
 
@@ -445,15 +507,9 @@ missionSelectScene = new scene(missionSelectCam)
 myGame.addScene(missionSelectScene);
 
 
-//the background
-missionSelectBackground = new gpObject();
-missionSelectBackground.sizeUI = new vector2D(1, 1)
-missionSelectBackground.positionUI = new vector2D(0, 0)
-missionSelectBackground.addComponent(new componentAdjustSizeGUI());
-missionSelectBackground.addComponent(new componentBasicDraw())
-missionSelectBackground.color = "rgb(0, 191, 255)";
-missionSelectScene.addGPObject(missionSelectBackground)
+addBackgroundAndSnow(missionSelectScene);
 
+missionSelectScene.addGPObject(createMoneyLable());
 
 
 missionOfferBackground = new Array();
@@ -477,15 +533,5 @@ for(i = 0; i < 9; i++){
 
 
 
-missionSelectBack = new gpObject();
-missionSelectBack.sizeUI = new vector2D(0.2, 0.05)
-missionSelectBack.positionUI = new vector2D(0.01, 0.01)
-missionSelectBack.addComponent(new componentAdjustSizeGUI());
-missionSelectBack.addComponent(new componentBasicDraw())
-missionSelectBack.addComponent(new componentClick())
-missionSelectBack.color = "rgb(255, 255, 255)";
-missionSelectBack.onClick = function(){
-	myGame.activeScene = menuScene.id;
-}
-missionSelectScene.addGPObject(missionSelectBack)
+missionSelectScene.addGPObject(createBackButton())
 

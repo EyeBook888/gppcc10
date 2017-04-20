@@ -311,14 +311,20 @@ function createMoneyLable(){
 	return Money;
 }
 
+backImage = new Image();
+backImage.src = "back.png";
+
 function createBackButton(){
 	back = new gpObject();
 	back.sizeUI = new vector2D(0.2, 0.05)
 	back.positionUI = new vector2D(0.01, 0.01)
 	back.addComponent(new componentAdjustSizeGUI());
+	back.addComponent(new componentAdjustSize());
 	back.addComponent(new componentBasicDraw())
 	back.addComponent(new componentClick())
-	back.color = "rgb(255, 255, 255)";
+	back.fixHeight = false;
+
+	back.image = backImage;
 	back.onClick = function(){
 		myGame.activeScene = menuScene.id;
 	}
@@ -479,7 +485,7 @@ for(i = 0; i < carList.length; i++){
 	shopScene.addGPObject(offerBackground[i])
 	offerCarImage[i] = new gpObject();
 	offerCarImage[i].sizeUI = new vector2D(0.1, 0.27)
-	offerCarImage[i].positionUI = new vector2D(x*0.33 + 0.015 + 0.1, y*0.30 + 0.115)
+	offerCarImage[i].positionUI = new vector2D(x*0.33 + 0.015 + 0.1, y*0.30 + 0.115 + 0.01)
 	offerCarImage[i].addComponent(new componentAdjustSizeGUI());
 	offerCarImage[i].addComponent(new componentAdjustSize());
 	offerCarImage[i].addComponent(new componentBasicDraw());

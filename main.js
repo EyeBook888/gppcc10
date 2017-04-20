@@ -33,16 +33,18 @@ bridgeRightImage.src = "./bridgeRight.png"
 snowImage = new Image();
 snowImage.src = "./snow.png"
 
-function car(name, image, width){
+function car(name, image, width, price){
 	this.image = image;
 	this.width = width;
 	this.name = name;
+	this.price = price;
+	this.bought = false;
 }
 
 
 carList = new Array();
-carList.push(new car("Käfer", vwImage, 60));
-carList.push(new car("Truck", truckImage, 100));
+carList.push(new car("Käfer", vwImage, 60, 0));
+carList.push(new car("Truck", truckImage, 100, 100));
 
 currentCar = carList[0];
 
@@ -460,6 +462,8 @@ shopScene.addGPObject(createMoneyLable());
 
 offerBackground = new Array();
 offerCarImage = new Array();
+offerPrice = new Array();
+
 i = 0;
 for(i = 0; i < carList.length; i++){
 	x = i%3;
@@ -471,18 +475,41 @@ for(i = 0; i < carList.length; i++){
 	offerBackground[i].addComponent(new componentBasicDraw())
 	offerBackground[i].addComponent(new componentClick())
 	offerBackground[i].carId = i;
-	offerBackground[i].color = "rgb(255, 255, 255)";
+	if(carList[i].bought){
+		offerBackground[i].color = "rgb(255, 255, 255)";
+	}else{
+		offerBackground[i].color = "red";
+	}
 	offerBackground[i].onClick = function(){
 		//change the color to green to show that this this car is selected
 		for (var i = 0; i < offerBackground.length; i++) {
-			offerBackground[i].color = "white";
+			if(carList[i].bought){
+				offerBackground[i].color = "rgb(255, 255, 255)";
+			}else{
+				offerBackground[i].color = "red";
+			}
 		};
+		
 
-		this.color = "green";
-		currentCar = carList[this.carId];
+		if(carList[this.carId].bought){
+			this.color = "green";
+			currentCar = carList[this.carId];
+		}else{
+			if(carList[this.carId].price <= savegame.money){
+				//buy the car if you have enough money
+				savegame.money -= carList[this.carId].price
+				carList[this.carId].bought = true;
+				this.color = "green";
+				currentCar = carList[this.carId];
+			}else{
+				alert("not enough money");
+			}
+		}
+
 	}
 
 	shopScene.addGPObject(offerBackground[i])
+	
 	offerCarImage[i] = new gpObject();
 	offerCarImage[i].sizeUI = new vector2D(0.1, 0.27)
 	offerCarImage[i].positionUI = new vector2D(x*0.33 + 0.015 + 0.1, y*0.30 + 0.115 + 0.01)
@@ -492,6 +519,19 @@ for(i = 0; i < carList.length; i++){
 	offerCarImage[i].fixHeight = false;
 	offerCarImage[i].image = carList[i].image;
 	shopScene.addGPObject(offerCarImage[i])
+
+
+
+	offerPrice[i] = new gpObject();
+	offerPrice[i].sizeUI = new vector2D(0.30, 0.03)
+	offerPrice[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115 + 0.24)
+	offerPrice[i].addComponent(new componentAdjustSizeGUI());
+	offerPrice[i].addComponent(new componentBasicDraw());
+	offerPrice[i].addComponent(new componentTextDraw());
+	offerPrice[i].textSize	= setting.DYNAMIC;
+	offerPrice[i].text 		= carList[i].price + "€";
+	offerPrice[i].color 	= "rgba(0,0,0,0.5)";
+	shopScene.addGPObject(offerPrice[i])
 		
 
 

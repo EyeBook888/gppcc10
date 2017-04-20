@@ -472,27 +472,28 @@ for(i = 0; i < carList.length; i++){
 	offerBackground[i].sizeUI = new vector2D(0.3, 0.27)
 	offerBackground[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115)
 	offerBackground[i].addComponent(new componentAdjustSizeGUI());
+	offerBackground[i].addComponent(new function(){//choose the right color
+		this.draw = function(camera){
+			//select the right color
+			if(carList[this.gpObject.carId] == currentCar){//selected
+				this.gpObject.color = "green";
+			}else if(carList[this.gpObject.carId].bought){ //unlocked
+				this.gpObject.color = "rgb(255, 255, 255)";
+			}else if(carList[this.gpObject.carId].price <= savegame.money){//locked and enough money
+				this.gpObject.color = "red";
+			}else{//locked and not enough money
+				this.gpObject.color = "gray";
+			}
+		}
+	});
 	offerBackground[i].addComponent(new componentBasicDraw())
 	offerBackground[i].addComponent(new componentClick())
 	offerBackground[i].carId = i;
-	if(carList[i].bought){
-		offerBackground[i].color = "rgb(255, 255, 255)";
-	}else{
-		offerBackground[i].color = "red";
-	}
+	offerBackground[i].color = "rgb(255, 255, 255)";
+	
 	offerBackground[i].onClick = function(){
-		//change the color to green to show that this this car is selected
-		for (var i = 0; i < offerBackground.length; i++) {
-			if(carList[i].bought){
-				offerBackground[i].color = "rgb(255, 255, 255)";
-			}else{
-				offerBackground[i].color = "red";
-			}
-		};
-		
 
 		if(carList[this.carId].bought){
-			this.color = "green";
 			currentCar = carList[this.carId];
 		}else{
 			if(carList[this.carId].price <= savegame.money){
@@ -501,8 +502,6 @@ for(i = 0; i < carList.length; i++){
 				carList[this.carId].bought = true;
 				this.color = "green";
 				currentCar = carList[this.carId];
-			}else{
-				alert("not enough money");
 			}
 		}
 

@@ -447,7 +447,7 @@ function componentAdjustSize(){
 			}else if(!this.gpObject.fixWidth && this.gpObject.fixHeight){
 				//fix height
 				factor = this.gpObject.size.x1/this.gpObject.image.height;
-				this.size.x0 = factor*this.gpObject.image.height;
+				this.gpObject.size.x0 = factor*this.gpObject.image.width;
 			}
 		}
 

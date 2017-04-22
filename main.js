@@ -29,24 +29,34 @@ bridgeLeftImage.src = "./bridgeLeft.png"
 bridgeRightImage = new Image();
 bridgeRightImage.src = "./bridgeRight.png"
 
+cargoImage = new Image();
+cargoImage.src = "./cargo.png"
+
+personImage = new Image();
+personImage.src = "./person.png"
+
+
 
 snowImage = new Image();
 snowImage.src = "./snow.png"
 
-function car(name, image, width, price){
-	this.image = image;
-	this.width = width;
-	this.name = name;
-	this.price = price;
-	this.bought = false;
+function car(name, image, width, seating, loadingSpace, price){
+	this.image 		= image;
+	this.width 		= width;
+	this.name 		= name;
+	this.price 		= price;
+	this.seating 	= seating;
+	this.loadingSpace = loadingSpace;
+	this.bought 	= false;
 }
 
 
 carList = new Array();
-carList.push(new car("Käfer", vwImage, 60, 0));
-carList.push(new car("Truck", truckImage, 100, 100));
+carList.push(new car("Käfer", vwImage, 60, 4, 4, 0));
+carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
 
-currentCar = carList[0];
+currentCar = carList[0]
+currentCar.bought = true;
 
 function startDriving(roadLength){
 
@@ -205,7 +215,7 @@ function startDriving(roadLength){
 			this.onCollide = function(ele){};
 		}
 	}
-	player.position = new vector2D(-50, 0);
+	player.position = new vector2D(-currentCar.width/2, 0);
 	player.image= currentCar.image;
 	player.fixHeight = false;
 	player.move = new vector2D(0, -0.5)
@@ -370,8 +380,9 @@ function addBackgroundAndSnow(scene){
 				}
 			}
 		});
-	
-		snow[i].move = new vector2D(0.1, 0.5)
+
+		moveVector = new vector2D(0.1, 0.5);
+		snow[i].move = moveVector;
 		scene.addGPObject(snow[i]);
 	}
 }
@@ -460,14 +471,22 @@ myGame.addScene(shopScene);
 addBackgroundAndSnow(shopScene);
 shopScene.addGPObject(createMoneyLable());
 
-offerBackground = new Array();
-offerCarImage = new Array();
-offerPrice = new Array();
+offerBackground 	= new Array();
+offerCarImage 		= new Array();
+offerCargoSymbol 	= new Array();
+offerCargoText 		= new Array();
+offerPersonSymbol 	= new Array();
+offerPersonText 		= new Array();
+offerPrice 			= new Array();
 
 i = 0;
 for(i = 0; i < carList.length; i++){
+	//at which row and which column the offer is
 	x = i%3;
 	y = Math.floor(i/3);
+
+
+	//the background for the current offer
 	offerBackground[i] = new gpObject();
 	offerBackground[i].sizeUI = new vector2D(0.3, 0.27)
 	offerBackground[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115)
@@ -509,6 +528,7 @@ for(i = 0; i < carList.length; i++){
 
 	shopScene.addGPObject(offerBackground[i])
 	
+	//the Image of the car
 	offerCarImage[i] = new gpObject();
 	offerCarImage[i].sizeUI = new vector2D(0.1, 0.27)
 	offerCarImage[i].positionUI = new vector2D(x*0.33 + 0.015 + 0.1, y*0.30 + 0.115 + 0.01)
@@ -521,6 +541,57 @@ for(i = 0; i < carList.length; i++){
 
 
 
+	//cargo 
+	offerCargoSymbol[i] = new gpObject();
+	offerCargoSymbol[i].sizeUI = new vector2D(0.08, 0.04)
+	offerCargoSymbol[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115 + 0.19)
+	offerCargoSymbol[i].addComponent(new componentAdjustSizeGUI());
+	offerCargoSymbol[i].addComponent(new componentAdjustSize());
+	offerCargoSymbol[i].addComponent(new componentBasicDraw());
+	offerCargoSymbol[i].fixWidth = false;
+	offerCargoSymbol[i].image	= cargoImage;
+	shopScene.addGPObject(offerCargoSymbol[i])
+
+	offerCargoText[i] = new gpObject();
+	offerCargoText[i].sizeUI = new vector2D(0.30, 0.04)
+	offerCargoText[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115 + 0.19)
+	offerCargoText[i].addComponent(new componentAdjustSizeGUI());
+	offerCargoText[i].addComponent(new componentBasicDraw());
+	offerCargoText[i].addComponent(new componentTextDraw());
+	offerCargoText[i].textSize	= setting.DYNAMIC;
+	offerCargoText[i].textAlign = setting.RIGHT;
+	offerCargoText[i].text 		= carList[i].loadingSpace + "";
+	offerCargoText[i].color 	= "rgba(0,0,0,0.5)";
+	shopScene.addGPObject(offerCargoText[i])
+
+
+
+	//person
+	offerPersonSymbol[i] = new gpObject();
+	offerPersonSymbol[i].sizeUI = new vector2D(0.08, 0.04)
+	offerPersonSymbol[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115 + 0.14)
+	offerPersonSymbol[i].addComponent(new componentAdjustSizeGUI());
+	offerPersonSymbol[i].addComponent(new componentAdjustSize());
+	offerPersonSymbol[i].addComponent(new componentBasicDraw());
+	offerPersonSymbol[i].fixWidth = false;
+	offerPersonSymbol[i].image	= personImage;
+	shopScene.addGPObject(offerPersonSymbol[i])
+
+	offerPersonText[i] = new gpObject();
+	offerPersonText[i].sizeUI = new vector2D(0.30, 0.04)
+	offerPersonText[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115 + 0.14)
+	offerPersonText[i].addComponent(new componentAdjustSizeGUI());
+	offerPersonText[i].addComponent(new componentBasicDraw());
+	offerPersonText[i].addComponent(new componentTextDraw());
+	offerPersonText[i].textSize	= setting.DYNAMIC;
+	offerPersonText[i].textAlign = setting.RIGHT;
+	offerPersonText[i].text 		= carList[i].seating + "";
+	offerPersonText[i].color 	= "rgba(0,0,0,0.5)";
+	shopScene.addGPObject(offerPersonText[i])
+
+
+
+	//price
 	offerPrice[i] = new gpObject();
 	offerPrice[i].sizeUI = new vector2D(0.30, 0.03)
 	offerPrice[i].positionUI = new vector2D(x*0.33 + 0.015, y*0.30 + 0.115 + 0.24)

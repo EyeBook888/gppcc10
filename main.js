@@ -50,13 +50,42 @@ function car(name, image, width, seating, loadingSpace, price){
 	this.bought 	= false;
 }
 
+function mission(length, person, loadingSpace, salary, penalty){
+	this.length 		= length;
+	this.person 		= person;
+	this.loadingSpace	= loadingSpace;
+	this.salary			= salary;
+	this.penalty		= penalty;
+}
+
 
 carList = new Array();
 carList.push(new car("Käfer", vwImage, 60, 4, 4, 0));
 carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
+carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
+carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
+carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
+carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
+carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
 
 currentCar = carList[0]
 currentCar.bought = true;
+
+
+
+
+missionList = new Array();
+for (var i = 0; i < 9; i++) {//create all missions
+	
+	length 		= Math.round(Math.random()*10);
+	person 		= Math.round(Math.random()*5);
+	loadingSpace= Math.round(Math.random()*10);
+	salary 		= Math.round(Math.random()*100);
+	penalty 	= Math.round(Math.random()*50);
+
+	missionList[i] = new mission(length, person, loadingSpace, salary, penalty);
+};
+
 
 function startDriving(roadLength){
 
@@ -637,12 +666,32 @@ for(i = 0; i < 9; i++){
 	missionOfferBackground[i].addComponent(new componentBasicDraw())
 	missionOfferBackground[i].addComponent(new componentTextDraw())
 	missionOfferBackground[i].addComponent(new componentClick())
-	missionOfferBackground[i].color = "rgb(255, 255, 255)";
+
+	missionOfferBackground[i].addComponent(new function(){//set the right color the the offer
+		this.draw = function (){
+			if(currentCar.seating >= missionList[this.gpObject.number].person && currentCar.loadingSpace >= missionList[this.gpObject.number].loadingSpace){
+				this.gpObject.color = "rgb(255, 255, 255)";
+			}else{
+				this.gpObject.color = "gray";
+			}
+		}
+	})
+
+	if(currentCar.seating >= missionList[i].person && currentCar.loadingSpace >= missionList[i].loadingSpace){
+		missionOfferBackground[i].color = "rgb(255, 255, 255)";
+	}else{
+		missionOfferBackground[i].color = "gray";
+	}
+	
+
 	missionOfferBackground[i].textSize = setting.DYNAMIC;
 	missionOfferBackground[i].number = i;
-	missionOfferBackground[i].text = ((i+1)*2) + "km";
+	missionOfferBackground[i].text = missionList[i].length + "km | " + missionList[i].person + " person | " + missionList[i].loadingSpace + " m3";
 	missionOfferBackground[i].onClick = function(){
-		startDriving((this.number+1)*2)
+		if(currentCar.seating >= missionList[this.number].person && currentCar.loadingSpace >= missionList[this.number].loadingSpace){
+			//only start if your car has the right condition
+			startDriving(missionList[this.number].length)
+		}
 	}
 	missionSelectScene.addGPObject(missionOfferBackground[i])
 }

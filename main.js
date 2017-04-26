@@ -87,9 +87,11 @@ for (var i = 0; i < 9; i++) {//create all missions
 };
 
 
-function startDriving(roadLength){
+currentMission = null;//which mission is selected
+function startDriving(mission){
+	currentMission = mission;
 
-	var roadLength = 700*roadLength;
+	var roadLength = 700*mission.length;
 
 	driverCam = new camera();
 	driverCam.ZoomInToFitWithOf = 700;
@@ -188,7 +190,7 @@ function startDriving(roadLength){
 	WinLine.onCollide = function(ele){
 		if(ele == player){
 			fadeOut.fadeIn();
-			savegame.money+=Math.round(roadLength/100);
+			savegame.money+=currentMission.salary;
 			//player.move.x1 = Math.min(player.move.x1+10, 0);//dirty but it works
 			this.onCollide = function(ele){};
 		}
@@ -321,6 +323,7 @@ function startDriving(roadLength){
 
 function gameover(){
 	//alert("gameover");
+	savegame.money-=currentMission.penalty;
 	player.move = new vector2D(0, 0)
 	fadeOut.fadeTime = 500
 	fadeOut.fadeIn();
@@ -689,8 +692,8 @@ for(i = 0; i < 9; i++){
 	missionOfferBackground[i].text = missionList[i].length + "km | " + missionList[i].person + " person | " + missionList[i].loadingSpace + " m3";
 	missionOfferBackground[i].onClick = function(){
 		if(currentCar.seating >= missionList[this.number].person && currentCar.loadingSpace >= missionList[this.number].loadingSpace){
-			//only start if your car has the right condition
-			startDriving(missionList[this.number].length)
+			//only start if your car has the right requirements 
+			startDriving(missionList[this.number])
 		}
 	}
 	missionSelectScene.addGPObject(missionOfferBackground[i])

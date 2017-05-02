@@ -201,10 +201,12 @@ function scene(camera){
 	}
 
 	this.controlStart = function(position){//default: go to all objects and trigger the handleClick if it has
-		console.log("click9");
-		for (var i = 0; i < this.objectList.length; i++) {
+		for (var i = this.objectList.length -1; i >= 0; i--) {
 			if(this.objectList[i].handleClick != null){
-				this.objectList[i].handleClick(position)
+				//call the function and check if the function should be called in other objects 
+				if(this.objectList[i].handleClick(position) == false){
+					return false;
+				}
 			}
 		}
 	}
@@ -572,6 +574,7 @@ function componentTextDraw(){
 	this.init = function(){
 		this.gpObject.addParameter("text", "");
 		this.gpObject.addParameter("textSize", 12);
+		this.gpObject.addParameter("visible", true);
 		this.gpObject.addParameter("textAlign", setting.CENTER);
 		this.gpObject.addParameter("border", 0.1);//in percent
 
@@ -579,52 +582,53 @@ function componentTextDraw(){
 	}
 
 	this.draw = function(camera){
-		camera.context.fillStyle = "black"
-
-		if(this.gpObject.textSize == setting.DYNAMIC){
-			if(! this.gpObject.size.equal(this.oldSize)){
-
-				this.oldSize = this.gpObject.size.copy();
-				//new text size
-
-				this.actualFontSize = 0;
-				camera.context.font = this.actualFontSize + "px Arial";
-
-				while(																					//border
-					camera.context.measureText(this.gpObject.text).width < (this.gpObject.size.x0 - (this.gpObject.size.x0*this.gpObject.border))*camera.zoomFactor &&
-					this.actualFontSize <  (this.gpObject.size.x1 - (this.gpObject.size.x1*this.gpObject.border))*camera.zoomFactor){
-
-						this.actualFontSize++;
-						camera.context.font = this.actualFontSize + "px Arial";
+		if(this.gpObject.visible){
+			camera.context.fillStyle = "black"
+	
+			if(this.gpObject.textSize == setting.DYNAMIC){
+				if(! this.gpObject.size.equal(this.oldSize)){
+	
+					this.oldSize = this.gpObject.size.copy();
+					//new text size
+	
+					this.actualFontSize = 0;
+					camera.context.font = this.actualFontSize + "px Arial";
+	
+					while(																					//border
+						camera.context.measureText(this.gpObject.text).width < (this.gpObject.size.x0 - (this.gpObject.size.x0*this.gpObject.border))*camera.zoomFactor &&
+						this.actualFontSize <  (this.gpObject.size.x1 - (this.gpObject.size.x1*this.gpObject.border))*camera.zoomFactor){
+	
+							this.actualFontSize++;
+							camera.context.font = this.actualFontSize + "px Arial";
+					}
 				}
+			}else{
+				this.actualFontSize = this.gpObject.textSize;
 			}
-		}else{
-			this.actualFontSize = this.gpObject.textSize;
+	
+			camera.context.font = this.actualFontSize + "px Arial";
+	
+			textPosition = camera.getScreenPosition(this.gpObject.position);
+			textPosition.x1+=this.gpObject.textSize;
+	
+			textWidth = camera.context.measureText(this.gpObject.text).width
+	
+			if(this.gpObject.textAlign == setting.LEFT){
+				textPosition = camera.getScreenPosition(this.gpObject.position);
+				textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
+			}else if(this.gpObject.textAlign == setting.RIGHT){
+				textPosition = camera.getScreenPosition(this.gpObject.position);
+				textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
+				textPosition.x0+=this.gpObject.size.x0*camera.zoomFactor-textWidth;
+			}else if(this.gpObject.textAlign == setting.CENTER){
+				textPosition = camera.getScreenPosition(this.gpObject.position);
+				textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
+				textPosition.x0+=(this.gpObject.size.x0*camera.zoomFactor-textWidth)/2;
+			}
+	
+			
+			camera.context.fillText(this.gpObject.text, textPosition.x0, textPosition.x1);
 		}
-
-		camera.context.font = this.actualFontSize + "px Arial";
-
-		textPosition = camera.getScreenPosition(this.gpObject.position);
-		textPosition.x1+=this.gpObject.textSize;
-
-		textWidth = camera.context.measureText(this.gpObject.text).width
-
-		if(this.gpObject.textAlign == setting.LEFT){
-			textPosition = camera.getScreenPosition(this.gpObject.position);
-			textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
-		}else if(this.gpObject.textAlign == setting.RIGHT){
-			textPosition = camera.getScreenPosition(this.gpObject.position);
-			textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
-			textPosition.x0+=this.gpObject.size.x0*camera.zoomFactor-textWidth;
-		}else if(this.gpObject.textAlign == setting.CENTER){
-			textPosition = camera.getScreenPosition(this.gpObject.position);
-			textPosition.x1+=this.actualFontSize*0.35 + this.gpObject.size.x1*camera.zoomFactor/2;
-			textPosition.x0+=(this.gpObject.size.x0*camera.zoomFactor-textWidth)/2;
-		}
-
-		
-		camera.context.fillText(this.gpObject.text, textPosition.x0, textPosition.x1);
-		
 	}
 }
 
@@ -672,15 +676,17 @@ function componentClick(){
 
 		this.gpObject.addParameter("positionUI",	new vector2D(0, 0));
 		this.gpObject.addParameter("sizeUI",	new vector2D(0, 0));
+		this.gpObject.addParameter("visible",	new vector2D(0, 0));
 		
 		this.gpObject.addParameter("handleClick", function(position){ 
 			if(	position.x0 >= this.positionUI.x0 &&
 				position.x0 <= this.positionUI.x0 + this.sizeUI.x0 &&
 				position.x1 >= this.positionUI.x1 &&
-				position.x1 <= this.positionUI.x1 + this.sizeUI.x1 
+				position.x1 <= this.positionUI.x1 + this.sizeUI.x1 &&
+				this.visible
 				){
 				this.onClick();
-				console.log("click11");
+				return false;
 			}
 			
 		});

@@ -40,6 +40,9 @@ personImage.src = "./person.png"
 snowImage = new Image();
 snowImage.src = "./snow.png"
 
+
+
+
 function car(name, image, width, seating, loadingSpace, price){
 	this.image 		= image;
 	this.width 		= width;
@@ -51,23 +54,65 @@ function car(name, image, width, seating, loadingSpace, price){
 }
 
 function mission(length, person, loadingSpace, salary, penalty){
-	this.length 		= length;
-	this.person 		= person;
-	this.loadingSpace	= loadingSpace;
-	this.salary			= salary;
-	this.penalty		= penalty;
+
+	this.id = 0;
+
+	this.set = function(length, person, loadingSpace, salary, penalty){
+		this.length 		= length;
+		this.person 		= person;
+		this.loadingSpace	= loadingSpace;
+		this.salary			= salary;
+		this.penalty		= penalty;
+	}
+
+
+	this.fitTheCar = function (car){
+		if(car.seating >= this.person && car.loadingSpace >= this.loadingSpace){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	this.fitAnyCar = function (mission){
+		for (var i = 0; i < carList.length; i++) {
+			if(this.fitTheCar(carList[i])){
+				return true;
+			}
+		};
+	}
+
+	this.generateRandom = function(){
+
+		if(this.id < carList.length){
+			//that there is always a job for your car
+			fitToCar = carList[this.id];
+		}else{
+			//that you have a equal amount for jobs for every car
+			fitToCar = carList[ Math.floor(Math.random()*carList.length - 0.000001) ]
+		}
+
+		length 		= Math.round(Math.random()*10) + 2;
+		person 		= Math.round(Math.random()*fitToCar.seating);
+		loadingSpace= Math.round(Math.random()*fitToCar.loadingSpace);
+		salary 		= Math.round(Math.random()*100);
+		penalty 	= Math.round(Math.random()*50);
+
+		this.set(length, person, loadingSpace, salary, penalty);
+	}
 }
 
 
 carList = new Array();
 carList.push(new car("Käfer", vwImage, 60, 4, 4, 0));
 carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
-carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
-carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
-carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
-carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
-carList.push(new car("Truck", truckImage, 100, 2, 1000, 100));
-
+carList.push(new car("Truck", truckImage, 100, 3, 500, 100));
+carList.push(new car("Truck", truckImage, 100, 1, 10000, 100));
+/*
+carList.push(new car("Truck", truckImage, 100, 3, 1000, 100));
+carList.push(new car("Truck", truckImage, 100, 1, 300, 100));
+carList.push(new car("Truck", truckImage, 100, 4, 3000, 100));
+*/
 currentCar = carList[0]
 currentCar.bought = true;
 
@@ -77,13 +122,9 @@ currentCar.bought = true;
 missionList = new Array();
 for (var i = 0; i < 9; i++) {//create all missions
 	
-	length 		= Math.round(Math.random()*10);
-	person 		= Math.round(Math.random()*5);
-	loadingSpace= Math.round(Math.random()*10);
-	salary 		= Math.round(Math.random()*100);
-	penalty 	= Math.round(Math.random()*50);
-
-	missionList[i] = new mission(length, person, loadingSpace, salary, penalty);
+	missionList[i] = new mission();
+	missionList[i].id = i;
+	missionList[i].generateRandom();
 };
 
 
@@ -188,11 +229,12 @@ function startDriving(mission){
 	WinLine.size = new vector2D(700, 100);
 	WinLine.color = "rgba(0, 255, 0, 0.3)";
 	WinLine.onCollide = function(ele){
-		if(ele == player){
+		if(ele == player){//win
 			fadeOut.fadeIn();
 			savegame.money+=currentMission.salary;
-			//player.move.x1 = Math.min(player.move.x1+10, 0);//dirty but it works
+			currentMission.generateRandom();
 			this.onCollide = function(ele){};
+			updateMissionButtons()
 		}
 	}
 	WinLine.position = new vector2D(-350 , -roadLength -WinLine.size.x1);
@@ -324,9 +366,11 @@ function startDriving(mission){
 function gameover(){
 	//alert("gameover");
 	savegame.money-=currentMission.penalty;
+	currentMission.generateRandom();
 	player.move = new vector2D(0, 0)
 	fadeOut.fadeTime = 500
 	fadeOut.fadeIn();
+	updateMissionButtons()
 }
 
 
@@ -672,7 +716,7 @@ for(i = 0; i < 9; i++){
 
 	missionOfferBackground[i].addComponent(new function(){//set the right color the the offer
 		this.draw = function (){
-			if(currentCar.seating >= missionList[this.gpObject.number].person && currentCar.loadingSpace >= missionList[this.gpObject.number].loadingSpace){
+			if(missionList[this.gpObject.number].fitTheCar(currentCar)){
 				this.gpObject.color = "rgb(255, 255, 255)";
 			}else{
 				this.gpObject.color = "gray";
@@ -680,24 +724,120 @@ for(i = 0; i < 9; i++){
 		}
 	})
 
-	if(currentCar.seating >= missionList[i].person && currentCar.loadingSpace >= missionList[i].loadingSpace){
+	if(missionList[i].fitTheCar(currentCar)){
 		missionOfferBackground[i].color = "rgb(255, 255, 255)";
 	}else{
 		missionOfferBackground[i].color = "gray";
 	}
-	
 
 	missionOfferBackground[i].textSize = setting.DYNAMIC;
 	missionOfferBackground[i].number = i;
 	missionOfferBackground[i].text = missionList[i].length + "km | " + missionList[i].person + " person | " + missionList[i].loadingSpace + " m3";
 	missionOfferBackground[i].onClick = function(){
-		if(currentCar.seating >= missionList[this.number].person && currentCar.loadingSpace >= missionList[this.number].loadingSpace){
-			//only start if your car has the right requirements 
-			startDriving(missionList[this.number])
+		if(missionList[this.number].fitTheCar(currentCar)){
+			//only start if your car has the right requirements
+			openFurtherInformation(missionList[this.number]);
 		}
 	}
 	missionSelectScene.addGPObject(missionOfferBackground[i])
 }
+
+function updateMissionButtons(){
+	for(i = 0; i < 9; i++){
+		missionOfferBackground[i].text = missionList[i].length + "km | " + missionList[i].person + " person | " + missionList[i].loadingSpace + " m3";
+	}
+}
+
+askForMission = null;
+function openFurtherInformation(mission){
+	askForMission = mission;
+	furtherInformationBackground.visible 	= true;
+	furtherInformationYes.visible 			= true;
+	furtherInformationNo.visible 			= true;
+	furtherInformationText.visible 			= true;
+}
+
+function closeFurtherInformation(){
+	askForMission = null;
+	furtherInformationBackground.visible 	= false;
+	furtherInformationYes.visible 			= false;
+	furtherInformationNo.visible 			= false;
+	furtherInformationText .visible			= false;
+}
+missionSelectScene.addGPObject(createBackButton())
+
+
+furtherInformationBackground = new gpObject();
+furtherInformationBackground.sizeUI = new vector2D(0.8, 0.5)
+furtherInformationBackground.positionUI = new vector2D(0.1, 0.25)
+furtherInformationBackground.addComponent(new componentAdjustSizeGUI());
+furtherInformationBackground.addComponent(new componentBasicDraw())
+furtherInformationBackground.addComponent(new componentTextDraw())
+furtherInformationBackground.addComponent(new componentClick())
+furtherInformationBackground.color = "rgb(255, 255, 255)";
+furtherInformationBackground.text = ""
+furtherInformationBackground.visible = false;
+furtherInformationBackground.onClick = function(){}
+furtherInformationBackground.textAlign = setting.CENTER;
+furtherInformationBackground.textSize = setting.DYNAMIC;
+missionSelectScene.addGPObject(furtherInformationBackground)
+
+
+furtherInformationText = new gpObject();
+furtherInformationText.sizeUI = new vector2D(0.8, 0.33)
+furtherInformationText.positionUI = new vector2D(0.1, 0.25)
+furtherInformationText.addComponent(new componentAdjustSizeGUI());
+furtherInformationText.addComponent(new componentBasicDraw())
+furtherInformationText.addComponent(new componentTextDraw())
+furtherInformationText.addComponent(new componentClick())
+furtherInformationText.color = "rgba(0,0,0,0)";
+furtherInformationText.text = "make this mission"
+furtherInformationText.visible = false;
+furtherInformationText.onClick = function(){}
+furtherInformationText.textAlign = setting.CENTER;
+furtherInformationText.textSize = setting.DYNAMIC;
+missionSelectScene.addGPObject(furtherInformationText)
+
+
+furtherInformationYes = new gpObject();
+furtherInformationYes.sizeUI = new vector2D(0.3, 0.1)
+furtherInformationYes.positionUI = new vector2D(0.15, 0.6)
+furtherInformationYes.addComponent(new componentAdjustSizeGUI());
+furtherInformationYes.addComponent(new componentBasicDraw())
+furtherInformationYes.addComponent(new componentTextDraw())
+furtherInformationYes.addComponent(new componentClick())
+furtherInformationYes.color = "rgb(100, 255, 100)";
+furtherInformationYes.text = "Yes"
+furtherInformationYes.visible = false;
+furtherInformationYes.onClick = function(){
+	startDriving(askForMission)
+}
+furtherInformationYes.textAlign = setting.CENTER;
+furtherInformationYes.textSize = setting.DYNAMIC;
+missionSelectScene.addGPObject(furtherInformationYes)
+
+
+
+missionSelectScene.addGPObject(createBackButton())
+
+
+
+furtherInformationNo = new gpObject();
+furtherInformationNo.sizeUI = new vector2D(0.3, 0.1)
+furtherInformationNo.positionUI = new vector2D(0.55, 0.6)
+furtherInformationNo.addComponent(new componentAdjustSizeGUI());
+furtherInformationNo.addComponent(new componentBasicDraw())
+furtherInformationNo.addComponent(new componentTextDraw())
+furtherInformationNo.addComponent(new componentClick())
+furtherInformationNo.color = "red";
+furtherInformationNo.text = "No"
+furtherInformationNo.visible = false;
+furtherInformationNo.onClick = function(){
+	closeFurtherInformation()
+}
+furtherInformationNo.textAlign = setting.CENTER;
+furtherInformationNo.textSize = setting.DYNAMIC;
+missionSelectScene.addGPObject(furtherInformationNo)
 
 
 

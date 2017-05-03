@@ -433,9 +433,12 @@ function addBackgroundAndSnow(scene){
 	//snow
 	snow = new Array();
 		
-	for(i = 0; i <= 60; i++){
+	for(i = 0; i <= 100; i++){
+		
+		distance = Math.random()*9 +1;
+
 		snow[i] = new gpObject();
-		snow[i].size = new vector2D(15, 15);
+		snow[i].size = new vector2D(Math.max(1/(distance)*30, 4), 15);
 		snow[i].color = "white";
 		snow[i].tag = "gameover"
 		snow[i].image = snowImage;
@@ -451,13 +454,13 @@ function addBackgroundAndSnow(scene){
 			this.draw = function(camera){
 				if(this.gpObject.position.x1 >= camera.canvas.height / camera.zoomFactor){
 					x = (Math.random()*700*2)-700;
-					y = - Math.random()* (camera.canvas.height / camera.zoomFactor);
+					y = - Math.random()* (camera.canvas.height / camera.zoomFactor) * 1.5;
 					this.gpObject.position = new vector2D(x, y);
 				}
 			}
 		});
 
-		moveVector = new vector2D(0.1, 0.5);
+		moveVector = new vector2D(0.1 / distance, 0.4 / distance);
 		snow[i].move = moveVector;
 		scene.addGPObject(snow[i]);
 	}
@@ -788,13 +791,13 @@ furtherInformationText.sizeUI = new vector2D(0.8, 0.33)
 furtherInformationText.positionUI = new vector2D(0.1, 0.25)
 furtherInformationText.addComponent(new componentAdjustSizeGUI());
 furtherInformationText.addComponent(new componentBasicDraw())
-furtherInformationText.addComponent(new componentTextDraw())
+furtherInformationText.addComponent(new componentMultiplyLinesTextDraw())
 furtherInformationText.addComponent(new componentClick())
 furtherInformationText.color = "rgba(0,0,0,0)";
 furtherInformationText.text = "make this mission"
 furtherInformationText.visible = false;
 furtherInformationText.onClick = function(){}
-furtherInformationText.textAlign = setting.CENTER;
+//furtherInformationText.textAlign = setting.CENTER;
 furtherInformationText.textSize = setting.DYNAMIC;
 missionSelectScene.addGPObject(furtherInformationText)
 
@@ -811,6 +814,7 @@ furtherInformationYes.text = "Yes"
 furtherInformationYes.visible = false;
 furtherInformationYes.onClick = function(){
 	startDriving(askForMission)
+	closeFurtherInformation()
 }
 furtherInformationYes.textAlign = setting.CENTER;
 furtherInformationYes.textSize = setting.DYNAMIC;

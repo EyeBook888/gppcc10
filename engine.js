@@ -632,6 +632,104 @@ function componentTextDraw(){
 	}
 }
 
+
+
+function componentMultiplyLinesTextDraw(){
+	this.init = function(){
+		this.gpObject.addParameter("text", "");
+		this.gpObject.addParameter("textSize", 12);
+		this.gpObject.addParameter("visible", true);
+		this.gpObject.addParameter("textAlign", setting.CENTER);
+		this.gpObject.addParameter("border", 0.1);//in percent
+
+		this.oldSize	= new vector2D(0, 0)//to check if the element has an other size on the screen
+		this.lines 		=  new Array();
+	}
+
+	this.splitLines = function(camera){//make many Lines from the text
+		pxWidth = (this.gpObject.size.x0 - (this.gpObject.size.x0*this.gpObject.border))*camera.zoomFactor;//the width of the Object on the screen
+
+		this.lines = new Array();
+		currentLine = 0;
+		this.lines[currentLine] = ""
+		for (var i = 0; i < this.gpObject.text.length; i++) {//check every Letter if it still fit in the Line
+			if(camera.context.measureText(this.lines[currentLine]+this.gpObject.text.charAt(i + 1)).width > pxWidth){
+				currentLine++;//next Line
+				this.lines[currentLine] = ""; //clear the Line
+			}
+			this.lines[currentLine] = this.lines[currentLine] + this.gpObject.text.charAt(i);
+			
+		};
+
+
+	}
+
+
+	this.draw = function(camera){
+		if(this.gpObject.visible){
+			camera.context.fillStyle = "black"
+			
+			camera.context.font = this.actualFontSize + "px Arial";
+			
+			if(! this.gpObject.size.equal(this.oldSize)){
+				this.splitLines(camera);
+
+				if(this.gpObject.textSize == setting.DYNAMIC){					
+					//new text size
+		
+					this.actualFontSize = 0;
+					camera.context.font = this.actualFontSize + "px Arial";
+					this.splitLines(camera);
+		
+					while( this.lines.length * this.actualFontSize < this.gpObject.size.x1*camera.zoomFactor){//make the size bigger, as long as it fit the Element
+		
+							this.actualFontSize++;
+							camera.context.font = this.actualFontSize + "px Arial";
+							this.splitLines(camera);
+					}
+					this.actualFontSize --;
+					console.log(this.actualFontSize)
+					camera.context.font = this.actualFontSize + "px Arial";
+					this.splitLines(camera);
+					
+				}else{
+					console.log("font");
+					this.actualFontSize = this.gpObject.textSize;
+				}
+
+				this.oldSize = this.gpObject.size.copy();
+
+			}
+
+
+			for (var i = 0; i < this.lines.length; i++) {
+	
+				text = this.lines[i];
+	
+				textPosition = camera.getScreenPosition(this.gpObject.position);
+				textPosition.x1+=this.gpObject.textSize;
+		
+				textWidth = camera.context.measureText(text).width
+		
+				if(this.gpObject.textAlign == setting.LEFT){
+					textPosition = camera.getScreenPosition(this.gpObject.position);
+				}else if(this.gpObject.textAlign == setting.RIGHT){
+					textPosition = camera.getScreenPosition(this.gpObject.position);
+					textPosition.x0+=this.gpObject.size.x0*camera.zoomFactor-textWidth;
+				}else if(this.gpObject.textAlign == setting.CENTER){
+					textPosition = camera.getScreenPosition(this.gpObject.position);
+					textPosition.x0+=(this.gpObject.size.x0*camera.zoomFactor-textWidth)/2;
+				}
+
+				textPosition.x1+=this.actualFontSize*(i + 1) + this.gpObject.border;
+		
+				
+				camera.context.fillText(text, textPosition.x0, textPosition.x1);
+				};
+		}
+	}
+}
+
 function componentFadeIn(){
 	this.init = function(){
 		this.gpObject.addParameter("endColorRGB", [255, 255, 255]);

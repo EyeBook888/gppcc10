@@ -53,6 +53,7 @@ function car(name, image, width, seating, loadingSpace, price){
 	this.bought 	= false;
 }
 
+
 function mission(length, person, loadingSpace, salary, penalty){
 
 	this.id = 0;
@@ -464,6 +465,22 @@ function addBackgroundAndSnow(scene){
 		snow[i].move = moveVector;
 		scene.addGPObject(snow[i]);
 	}
+
+
+	cloud = new gpObject();
+	cloud.size = new vector2D(500, 500);
+	cloud.color = "white";
+	cloud.tag = "gameover"
+	cloud.image = snowImage;
+	cloud.fixHeight = false;
+	cloud.position = new vector2D(-250, -250);
+	cloud.addComponent(new componentMovement());
+	cloud.addComponent(new componentAdjustSize());
+	cloud.addComponent(new componentBasicDraw());
+
+	scene.addGPObject(cloud);
+	
+
 }
 
 
@@ -555,7 +572,7 @@ offerCarImage 		= new Array();
 offerCargoSymbol 	= new Array();
 offerCargoText 		= new Array();
 offerPersonSymbol 	= new Array();
-offerPersonText 		= new Array();
+offerPersonText 	= new Array();
 offerPrice 			= new Array();
 
 i = 0;
@@ -758,6 +775,8 @@ function openFurtherInformation(mission){
 	furtherInformationYes.visible 			= true;
 	furtherInformationNo.visible 			= true;
 	furtherInformationText.visible 			= true;
+
+	furtherInformationText.text = "You will earn " + askForMission.salary + "€. But if you fail the penalty will be " + askForMission.penalty + "€."
 }
 
 function closeFurtherInformation(){

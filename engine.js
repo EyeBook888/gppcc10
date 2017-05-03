@@ -643,21 +643,24 @@ function componentMultiplyLinesTextDraw(){
 		this.gpObject.addParameter("border", 0.1);//in percent
 
 		this.oldSize	= new vector2D(0, 0)//to check if the element has an other size on the screen
+		this.oldText	= new vector2D(0, 0)//to check if the text as change
 		this.lines 		=  new Array();
 	}
 
 	this.splitLines = function(camera){//make many Lines from the text
 		pxWidth = (this.gpObject.size.x0 - (this.gpObject.size.x0*this.gpObject.border))*camera.zoomFactor;//the width of the Object on the screen
 
+		words = this.gpObject.text.split(" ");
+
 		this.lines = new Array();
 		currentLine = 0;
 		this.lines[currentLine] = ""
-		for (var i = 0; i < this.gpObject.text.length; i++) {//check every Letter if it still fit in the Line
-			if(camera.context.measureText(this.lines[currentLine]+this.gpObject.text.charAt(i + 1)).width > pxWidth){
+		for (var i = 0; i < words.length; i++) {//check every Letter if it still fit in the Line
+			if(camera.context.measureText(this.lines[currentLine] + " " + words[i]).width > pxWidth){
 				currentLine++;//next Line
 				this.lines[currentLine] = ""; //clear the Line
 			}
-			this.lines[currentLine] = this.lines[currentLine] + this.gpObject.text.charAt(i);
+			this.lines[currentLine] = this.lines[currentLine] + " " + words[i];
 			
 		};
 
@@ -670,8 +673,8 @@ function componentMultiplyLinesTextDraw(){
 			camera.context.fillStyle = "black"
 			
 			camera.context.font = this.actualFontSize + "px Arial";
-			
-			if(! this.gpObject.size.equal(this.oldSize)){
+
+			if(! this.gpObject.size.equal(this.oldSize) || this.gpObject.text != this.oldText){
 				this.splitLines(camera);
 
 				if(this.gpObject.textSize == setting.DYNAMIC){					
@@ -698,6 +701,7 @@ function componentMultiplyLinesTextDraw(){
 				}
 
 				this.oldSize = this.gpObject.size.copy();
+				this.oldText = this.gpObject.text
 
 			}
 

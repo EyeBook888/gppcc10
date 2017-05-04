@@ -773,6 +773,137 @@ function componentFadeIn(){
 	}
 }
 
+
+function componentScrollIn(){
+	this.init = function(){
+		this.gpObject.addParameter("positionUI", 0);
+		this.gpObject.addParameter("fadeTime",  300);
+		this.gpObject.addParameter("startTime", 0);
+
+		this.gpObject.addParameter("onFadeIn",  null);
+		this.gpObject.addParameter("alreadyTriggeredOnFadeIn", true);
+		
+		this.gpObject.addParameter("fadeIn", function(){
+			this.visible = true;
+			this.startTime = new Date().getTime();
+			this.alreadyTriggeredOnFadeIn = false;
+		})
+
+		this.gpObject.visible = false;
+
+
+	}
+
+	this.draw = function(camera){
+		passedTime =  new Date().getTime() - this.gpObject.startTime;
+		positionPercent = Math.min(1, passedTime/this.gpObject.fadeTime);
+
+		if(positionPercent == 1 && !this.gpObject.alreadyTriggeredOnFadeIn){//trigger the onFadeIn event
+			this.gpObject.alreadyTriggeredOnFadeIn = true;
+			if(this.gpObject.onFadeIn != null){
+				this.gpObject.onFadeIn();
+			}
+		}
+
+
+		start = new vector2D(0, 0);
+		start.add(this.gpObject.positionUI);
+		start.add(new vector2D(-1, -1))
+
+		start.x0 *= camera.canvas.width;	//to px values
+		start.x1 *= camera.canvas.height;
+		
+		start.divided(camera.zoomFactor);
+		start.add(camera.position);
+
+		startY = start.x1;
+
+
+
+		end = new vector2D(0, 0);
+		end.add(this.gpObject.positionUI);
+
+		end.x0 *= camera.canvas.width;	//to px values
+		end.x1 *= camera.canvas.height;
+		
+		end.divided(camera.zoomFactor);
+		end.add(camera.position);
+
+		endY = end.x1;
+
+
+		this.gpObject.position.x1 = startY + ((endY-startY)*positionPercent);
+	}
+}
+
+
+
+function componentScrollOut(){
+	this.init = function(){
+		this.gpObject.addParameter("positionUI", 0);
+		this.gpObject.addParameter("fadeTime",  300);
+		this.gpObject.addParameter("startTimeOut", 0);
+		this.gpObject.addParameter("onFadeOutMode", false);
+
+		this.gpObject.addParameter("onFadeOut",  null);
+		this.gpObject.addParameter("alreadyTriggeredOnFadeOut", true);
+		
+		this.gpObject.addParameter("fadeOut", function(){
+			this.startTimeOut = new Date().getTime();
+			this.alreadyTriggeredOnFadeOut = false;
+			this.onFadeOutMode = true;
+		})
+
+
+	}
+
+	this.draw = function(camera){
+		passedTime =  new Date().getTime() - this.gpObject.startTimeOut;
+		positionPercent = Math.min(1, passedTime/this.gpObject.fadeTime);
+
+		if(positionPercent == 1 && !this.gpObject.alreadyTriggeredOnFadeOut){//trigger the onFadeIn event
+			this.gpObject.alreadyTriggeredOnFadeOut = true;
+			this.gpObject.onFadeOutMode = false;
+			this.gpObject.visible = false;
+			if(this.gpObject.onFadeOut != null){
+				this.gpObject.onFadeOut();
+			}
+		}
+
+		if(this.gpObject.onFadeOutMode){
+			end = new vector2D(0, 0);
+			end.add(this.gpObject.positionUI);
+			end.add(new vector2D(-1, -1))
+	
+			end.x0 *= camera.canvas.width;	//to px values
+			end.x1 *= camera.canvas.height;
+			
+			end.divided(camera.zoomFactor);
+			end.add(camera.position);
+	
+			endY = end.x1;
+	
+	
+	
+			start = new vector2D(0, 0);
+			start.add(this.gpObject.positionUI);
+	
+			start.x0 *= camera.canvas.width;	//to px values
+			start.x1 *= camera.canvas.height;
+			
+			start.divided(camera.zoomFactor);
+			start.add(camera.position);
+	
+			startY = start.x1;
+	
+	
+			this.gpObject.position.x1 = startY + ((endY-startY)*positionPercent);
+		}
+	}
+}
+
+
+
 function componentClick(){
 	this.init = function(){
 

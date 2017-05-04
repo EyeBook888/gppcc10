@@ -251,15 +251,8 @@ function startDriving(mission){
 	looseLeftBorder.size = new vector2D(100, roadLength +500);
 	looseLeftBorder.tag = "gameover"
 	looseLeftBorder.color = "red";
-	looseLeftBorder.onCollide = function(ele){
-		if(ele == player){
-			gameover();
-			this.onCollide = function(ele){};
-		}
-	}
 	looseLeftBorder.position = new vector2D(-450 , -roadLength);
 	looseLeftBorder.addComponent(new componentAdjustSize())
-	looseLeftBorder.addComponent(new componentCollide())
 	looseLeftBorder.addComponent(new componentBasicDraw())
 	driverScene.addGPObject(looseLeftBorder);
 
@@ -267,15 +260,8 @@ function startDriving(mission){
 	looseRightBorder.size = new vector2D(100, roadLength +500);
 	looseRightBorder.tag = "gameover"
 	looseRightBorder.color = "red";
-	looseRightBorder.onCollide = function(ele){
-		if(ele == player){
-			gameover();
-			this.onCollide = function(ele){};
-		}
-	}
 	looseRightBorder.position = new vector2D(350 , -roadLength);
 	looseRightBorder.addComponent(new componentAdjustSize())
-	looseRightBorder.addComponent(new componentCollide())
 	looseRightBorder.addComponent(new componentBasicDraw())
 	driverScene.addGPObject(looseRightBorder);
 
@@ -289,7 +275,7 @@ function startDriving(mission){
 			this.onCollide = function(ele){};
 		}
 	}
-	player.position = new vector2D(-currentCar.width/2, 0);
+	player.position = new vector2D(-currentCar.width/2, 100);
 	player.image= currentCar.image;
 	player.fixHeight = false;
 	player.move = new vector2D(0, -0.5)
@@ -334,7 +320,7 @@ function startDriving(mission){
 	cameraFocus = new gpObject();
 	cameraFocus.size = new vector2D(100, 250);
 	cameraFocus.color = "rgba(0, 0, 0, 0)"
-	cameraFocus.position = new vector2D(-50, 0);
+	cameraFocus.position = new vector2D(-50, 100);
 	cameraFocus.fixHeight = false;
 	cameraFocus.move = new vector2D(0, -0.5)
 	cameraFocus.addComponent(new componentAdjustSize())
@@ -771,20 +757,20 @@ function updateMissionButtons(){
 askForMission = null;
 function openFurtherInformation(mission){
 	askForMission = mission;
-	furtherInformationBackground.visible 	= true;
-	furtherInformationYes.visible 			= true;
-	furtherInformationNo.visible 			= true;
-	furtherInformationText.visible 			= true;
+	furtherInformationBackground.fadeIn();
+	furtherInformationYes.fadeIn()
+	furtherInformationNo.fadeIn();
+	furtherInformationText.fadeIn();
 
 	furtherInformationText.text = "You will earn " + askForMission.salary + "€. But if you fail the penalty will be " + askForMission.penalty + "€."
 }
 
 function closeFurtherInformation(){
 	askForMission = null;
-	furtherInformationBackground.visible 	= false;
-	furtherInformationYes.visible 			= false;
-	furtherInformationNo.visible 			= false;
-	furtherInformationText .visible			= false;
+	furtherInformationBackground.fadeOut()
+	furtherInformationYes.fadeOut()
+	furtherInformationNo.fadeOut()
+	furtherInformationText.fadeOut()
 }
 missionSelectScene.addGPObject(createBackButton())
 
@@ -793,6 +779,8 @@ furtherInformationBackground = new gpObject();
 furtherInformationBackground.sizeUI = new vector2D(0.8, 0.5)
 furtherInformationBackground.positionUI = new vector2D(0.1, 0.25)
 furtherInformationBackground.addComponent(new componentAdjustSizeGUI());
+furtherInformationBackground.addComponent(new componentScrollIn());
+furtherInformationBackground.addComponent(new componentScrollOut());
 furtherInformationBackground.addComponent(new componentBasicDraw())
 furtherInformationBackground.addComponent(new componentTextDraw())
 furtherInformationBackground.addComponent(new componentClick())
@@ -809,6 +797,8 @@ furtherInformationText = new gpObject();
 furtherInformationText.sizeUI = new vector2D(0.8, 0.33)
 furtherInformationText.positionUI = new vector2D(0.1, 0.25)
 furtherInformationText.addComponent(new componentAdjustSizeGUI());
+furtherInformationText.addComponent(new componentScrollIn());
+furtherInformationText.addComponent(new componentScrollOut());
 furtherInformationText.addComponent(new componentBasicDraw())
 furtherInformationText.addComponent(new componentMultiplyLinesTextDraw())
 furtherInformationText.addComponent(new componentClick())
@@ -825,6 +815,8 @@ furtherInformationYes = new gpObject();
 furtherInformationYes.sizeUI = new vector2D(0.3, 0.1)
 furtherInformationYes.positionUI = new vector2D(0.15, 0.6)
 furtherInformationYes.addComponent(new componentAdjustSizeGUI());
+furtherInformationYes.addComponent(new componentScrollIn());
+furtherInformationYes.addComponent(new componentScrollOut());
 furtherInformationYes.addComponent(new componentBasicDraw())
 furtherInformationYes.addComponent(new componentTextDraw())
 furtherInformationYes.addComponent(new componentClick())
@@ -849,6 +841,8 @@ furtherInformationNo = new gpObject();
 furtherInformationNo.sizeUI = new vector2D(0.3, 0.1)
 furtherInformationNo.positionUI = new vector2D(0.55, 0.6)
 furtherInformationNo.addComponent(new componentAdjustSizeGUI());
+furtherInformationNo.addComponent(new componentScrollIn());
+furtherInformationNo.addComponent(new componentScrollOut());
 furtherInformationNo.addComponent(new componentBasicDraw())
 furtherInformationNo.addComponent(new componentTextDraw())
 furtherInformationNo.addComponent(new componentClick())

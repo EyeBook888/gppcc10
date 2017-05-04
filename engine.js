@@ -483,6 +483,55 @@ function componentBasicDraw(){
 	}
 }
 
+
+function componentDrawRoundCorners(){
+	this.init = function(){
+
+
+		this.gpObject.addParameter("position",	new vector2D(0, 0));
+		this.gpObject.addParameter("size", 		new vector2D(0, 0));
+		this.gpObject.addParameter("radius", 0.05);
+
+
+		this.gpObject.addParameter("color", 	"red");
+
+		this.gpObject.addParameter("visible",	true);
+	}
+
+	this.draw = function(camera){
+		if(this.gpObject.visible){
+			ScreenPosition = camera.getScreenPosition(this.gpObject.position)
+			ScreenSize = this.gpObject.size.copy();
+			ScreenSize.times(camera.zoomFactor)
+			
+			radius 	= this.gpObject.radius * this.gpObject.size.x1;
+			radius 	= {tl: radius, tr: radius, br: radius, bl: radius};
+
+			width 	= ScreenSize.x0;
+			height 	= ScreenSize.x1;
+
+			x 		= ScreenPosition.x0;
+			y 		= ScreenPosition.x1;
+
+			camera.context.fillStyle = this.gpObject.color;
+
+			camera.context.beginPath();
+			camera.context.moveTo(x + radius.tl, y);
+			camera.context.lineTo(x + width - radius.tr, y);
+			camera.context.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+			camera.context.lineTo(x + width, y + height - radius.br);
+			camera.context.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+			camera.context.lineTo(x + radius.bl, y + height);
+			camera.context.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+			camera.context.lineTo(x, y + radius.tl);
+			camera.context.quadraticCurveTo(x, y, x + radius.tl, y);
+			camera.context.closePath();
+			camera.context.fill();
+
+		}
+	}
+}
+
 function componentBackground(){
 
 	this.init = function(){
@@ -929,4 +978,44 @@ function componentClick(){
 	}
 }
 
+
+
+/*
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+  if (typeof stroke == 'undefined') {
+    stroke = true;
+  }
+  if (typeof radius === 'undefined') {
+    radius = 5;
+  }
+  if (typeof radius === 'number') {
+    radius = {tl: radius, tr: radius, br: radius, bl: radius};
+  } else {
+    var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+    for (var side in defaultRadius) {
+      radius[side] = radius[side] || defaultRadius[side];
+    }
+  }
+  ctx.beginPath();
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + width - radius.tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+  ctx.lineTo(x + width, y + height - radius.br);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+  ctx.lineTo(x + radius.bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+  ctx.closePath();
+  if (fill) {
+    ctx.fill();
+  }
+  if (stroke) {
+    ctx.stroke();
+  }
+
+}
+
+
+*/
 

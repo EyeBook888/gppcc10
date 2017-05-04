@@ -489,7 +489,7 @@ missionButton = new gpObject();
 missionButton.sizeUI = new vector2D(0.6, 0.1)
 missionButton.positionUI = new vector2D(0.2, 0.1)
 missionButton.addComponent(new componentAdjustSizeGUI());
-missionButton.addComponent(new componentBasicDraw())
+missionButton.addComponent(new componentDrawRoundCorners());
 missionButton.addComponent(new componentTextDraw())
 missionButton.addComponent(new componentClick())
 missionButton.color = "rgb(255, 255, 255)";
@@ -507,7 +507,7 @@ carShop = new gpObject();
 carShop.sizeUI = new vector2D(0.6, 0.1)
 carShop.positionUI = new vector2D(0.2, 0.25)
 carShop.addComponent(new componentAdjustSizeGUI());
-carShop.addComponent(new componentBasicDraw())
+carShop.addComponent(new componentDrawRoundCorners())
 carShop.addComponent(new componentTextDraw())
 carShop.addComponent(new componentClick())
 carShop.color = "rgb(255, 255, 255)";
@@ -525,7 +525,7 @@ authorities = new gpObject();
 authorities.sizeUI = new vector2D(0.6, 0.1)
 authorities.positionUI = new vector2D(0.2, 0.4)
 authorities.addComponent(new componentAdjustSizeGUI());
-authorities.addComponent(new componentBasicDraw())
+authorities.addComponent(new componentDrawRoundCorners())
 authorities.addComponent(new componentTextDraw())
 authorities.addComponent(new componentClick())
 authorities.color = "rgb(255, 255, 255)";
@@ -587,7 +587,7 @@ for(i = 0; i < carList.length; i++){
 			}
 		}
 	});
-	offerBackground[i].addComponent(new componentBasicDraw())
+	offerBackground[i].addComponent(new componentDrawRoundCorners())
 	offerBackground[i].addComponent(new componentClick())
 	offerBackground[i].carId = i;
 	offerBackground[i].color = "rgb(255, 255, 255)";
@@ -682,7 +682,7 @@ for(i = 0; i < carList.length; i++){
 	offerPrice[i].addComponent(new componentTextDraw());
 	offerPrice[i].textSize	= setting.DYNAMIC;
 	offerPrice[i].text 		= carList[i].price + "€";
-	offerPrice[i].color 	= "rgba(0,0,0,0.5)";
+	offerPrice[i].color 	= "rgba(0,0,0,0)";
 	shopScene.addGPObject(offerPrice[i])
 		
 
@@ -716,7 +716,7 @@ for(i = 0; i < 9; i++){
 	missionOfferBackground[i].sizeUI = new vector2D(0.9, 1/10-0.01)
 	missionOfferBackground[i].positionUI = new vector2D(0.05, i*(1/10) + 0.1);
 	missionOfferBackground[i].addComponent(new componentAdjustSizeGUI());
-	missionOfferBackground[i].addComponent(new componentBasicDraw())
+	missionOfferBackground[i].addComponent(new componentDrawRoundCorners())
 	missionOfferBackground[i].addComponent(new componentTextDraw())
 	missionOfferBackground[i].addComponent(new componentClick())
 
@@ -781,7 +781,7 @@ furtherInformationBackground.positionUI = new vector2D(0.1, 0.25)
 furtherInformationBackground.addComponent(new componentAdjustSizeGUI());
 furtherInformationBackground.addComponent(new componentScrollIn());
 furtherInformationBackground.addComponent(new componentScrollOut());
-furtherInformationBackground.addComponent(new componentBasicDraw())
+furtherInformationBackground.addComponent(new componentDrawRoundCorners())
 furtherInformationBackground.addComponent(new componentTextDraw())
 furtherInformationBackground.addComponent(new componentClick())
 furtherInformationBackground.color = "rgb(255, 255, 255)";
@@ -817,7 +817,7 @@ furtherInformationYes.positionUI = new vector2D(0.15, 0.6)
 furtherInformationYes.addComponent(new componentAdjustSizeGUI());
 furtherInformationYes.addComponent(new componentScrollIn());
 furtherInformationYes.addComponent(new componentScrollOut());
-furtherInformationYes.addComponent(new componentBasicDraw())
+furtherInformationYes.addComponent(new componentDrawRoundCorners())
 furtherInformationYes.addComponent(new componentTextDraw())
 furtherInformationYes.addComponent(new componentClick())
 furtherInformationYes.color = "rgb(100, 255, 100)";
@@ -843,7 +843,7 @@ furtherInformationNo.positionUI = new vector2D(0.55, 0.6)
 furtherInformationNo.addComponent(new componentAdjustSizeGUI());
 furtherInformationNo.addComponent(new componentScrollIn());
 furtherInformationNo.addComponent(new componentScrollOut());
-furtherInformationNo.addComponent(new componentBasicDraw())
+furtherInformationNo.addComponent(new componentDrawRoundCorners())
 furtherInformationNo.addComponent(new componentTextDraw())
 furtherInformationNo.addComponent(new componentClick())
 furtherInformationNo.color = "red";

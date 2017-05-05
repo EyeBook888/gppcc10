@@ -23,6 +23,16 @@ IceImage.src = "./ice.png";
 RoadImage = new Image();
 RoadImage.src = "./road.png"
 
+
+
+RoadSnowImage0 = new Image();
+RoadSnowImage0.src = "./snowOnRoad0.png"
+
+RoadSnowImage1 = new Image();
+RoadSnowImage1.src = "./snowOnRoad1.png"
+
+
+
 bridgeLeftImage = new Image();
 bridgeLeftImage.src = "./bridgeLeft.png"
 
@@ -172,6 +182,17 @@ function startDriving(mission){
 	road.addComponent(new componentAdjustSize());
 	road.addComponent(new componentBackground());
 	driverScene.addGPObject(road);
+
+	roadSnow = new gpObject();
+	roadSnow.size = new vector2D(700, 90);
+	roadSnow.color = "blue";
+	roadSnow.image = RoadSnowImage0;
+	roadSnow.images = [RoadSnowImage1];
+	roadSnow.fixHeight = false;
+	roadSnow.position = new vector2D(-350, 432);
+	roadSnow.addComponent(new componentAdjustSize());
+	roadSnow.addComponent(new componentBackground());
+	driverScene.addGPObject(roadSnow);
 	
 	iceDistance = 800;
 	neededIce 	= Math.floor(roadLength/iceDistance);
@@ -529,7 +550,7 @@ authorities.addComponent(new componentDrawRoundCorners())
 authorities.addComponent(new componentTextDraw())
 authorities.addComponent(new componentClick())
 authorities.color = "rgb(255, 255, 255)";
-authorities.text = "local authorities"
+authorities.text = "story"
 authorities.onClick = function(){
 	alert("coming soon");
 }

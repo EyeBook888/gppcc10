@@ -540,9 +540,13 @@ function componentBackground(){
 
 		this.gpObject.addParameter("color", 	"red");
 		this.gpObject.addParameter("image", 	null);
+		this.gpObject.addParameter("images", 	new Array);//for Images to draw instead
 	}
 
 	this.draw = function(camera){
+		if(this.gpObject.images[this.gpObject.images.length-1] != this.gpObject.image){//if the Image is not part of the list add it
+			this.gpObject.images.push(this.gpObject.image);
+		}
 
 		screenSize = new vector2D(
 			Math.floor(this.gpObject.size.x0*camera.zoomFactor)-1,
@@ -554,12 +558,29 @@ function componentBackground(){
 
 		for (var x = -1; x < tiles.x0; x++) {
 			for (var y = -1; y < tiles.x1; y++) {
-				if(this.gpObject.image != null){//if there is a Image
+				if(this.gpObject.images != null){//if there is a Image
+
+					sizeBySreenSize = screenSize.copy();//so that there is no rounding error
+					sizeBySreenSize.divided(camera.zoomFactor);
+
+
+										// (positionOfObject - positionOfZeroObject) [= distance] / size
+					realY = Math.floor(((camera.position.x1+y*sizeBySreenSize.x1)-this.gpObject.position.x1)/sizeBySreenSize.x1)
+					realX = Math.floor(((camera.position.x0+x*sizeBySreenSize.x0)-this.gpObject.position.x0)/sizeBySreenSize.x0)
+
+
+					distance = camera.position.copy();//the way between the camera and the Object
+					distance.subtract(this.gpObject.position)
 					
 					offsetX = camera.getScreenPosition(this.gpObject.position).x0%(screenSize.x0);
 					offsetY = camera.getScreenPosition(this.gpObject.position).x1%(screenSize.x1);
 
-					camera.context.drawImage(this.gpObject.image,
+					id = stringHashCode(realY + " " + realX);
+					//console.log(id);
+
+					image = this.gpObject.images[Math.abs(id)%this.gpObject.images.length];
+					//console.log(image.src)
+					camera.context.drawImage(image,
 					 x*screenSize.x0 + offsetX, 
 					 y*screenSize.x1 + offsetY, 
 					 screenSize.x0+1, 
@@ -978,44 +999,13 @@ function componentClick(){
 	}
 }
 
-
-
-/*
-function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-  if (typeof stroke == 'undefined') {
-    stroke = true;
+function stringHashCode (string) {
+  var hash = 0, i, chr;
+  if (string.length === 0) return hash;
+  for (i = 0; i < string.length; i++) {
+    chr   = string.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
   }
-  if (typeof radius === 'undefined') {
-    radius = 5;
-  }
-  if (typeof radius === 'number') {
-    radius = {tl: radius, tr: radius, br: radius, bl: radius};
-  } else {
-    var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
-    for (var side in defaultRadius) {
-      radius[side] = radius[side] || defaultRadius[side];
-    }
-  }
-  ctx.beginPath();
-  ctx.moveTo(x + radius.tl, y);
-  ctx.lineTo(x + width - radius.tr, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
-  ctx.lineTo(x + width, y + height - radius.br);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-  ctx.lineTo(x + radius.bl, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
-  ctx.lineTo(x, y + radius.tl);
-  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
-  ctx.closePath();
-  if (fill) {
-    ctx.fill();
-  }
-  if (stroke) {
-    ctx.stroke();
-  }
-
-}
-
-
-*/
-
+  return hash;
+};
